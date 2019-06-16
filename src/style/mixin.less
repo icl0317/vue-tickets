@@ -1,0 +1,59 @@
+@lightColor: #999;
+@deepColor: #444;
+@warnColor: #ff9900;
+@errorColor: #ff6969;
+@fff:#fff;
+@ddd:#ddd;
+@smallSize:12px;
+@normalSize:14px;
+@bigSize:16px;
+
+.fullPos() {
+  position: absolute;
+  left: 0;
+  top: 0;
+  right: 0;
+  bottom: 0;
+}
+
+.borderRadius(@radius) {
+  -webkit-border-radius: @radius;
+  -moz-border-radius: @radius;
+  -ms-border-radius: @radius;
+  border-radius: @radius;
+}
+
+.textCut(){
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
+}
+
+.RowsCut(@n){
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: @n;
+  overflow: hidden;
+}
+
+.flexHV(){
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.full(){
+  width: 100%;
+  height: 100%;
+}
+
+.hz(){
+  position: absolute;
+  left:50%;
+  transform: translateX(-50%)
+}
+.hzvc{
+  .hz();
+  top:50%;
+  transform: translate(-50%,-50%)
+}
