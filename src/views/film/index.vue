@@ -75,7 +75,7 @@
 import fixedFoot from "@/components/fixedFooter/foot";
 import loading from "@/components/loading/loading";
 import { stampToTime, findInArr } from "@/utils/util";
-import { getFilmList, getLocationCollege, getCinemaList } from "@/api/api";
+import { getIndexFilmList, getLocationCollege, getCinemaList } from "@/api/api";
 import "@/utils/geolocation.min";
 export default {
   name: "film-list",
@@ -139,7 +139,7 @@ export default {
     },
     //获取排期数据
     getFilmData(cinema_id, college_id) {
-      getFilmList({ cinema_id, college_id}).then(res => {
+      getIndexFilmList({ cinema_id, college_id}).then(res => {
         let { code, data, msg } = res;
         if (code == 0) {
           this.filmData = this.formatFilmData(data.session);

@@ -8,8 +8,8 @@ export function getCinemaList (params = {}){
     return Get("/api/getCinemaList", params);
 }
 //獲取學校影院排期
-export function getFilmList (params = {}){
-    return Get("/api/getFilmList", params);
+export function getIndexFilmList (params = {}){
+    return Get("/api/getIndexFilmList", params);
 }
 //獲取定位學校
 export function getLocationCollege (params = {}){
