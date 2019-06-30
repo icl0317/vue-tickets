@@ -1,7 +1,7 @@
 <template>
   <div id="cinema-list">
     <topBar :backShow="false" title="选择影院">
-      <span class="go-info iconfont" @click="goCityList">学校列表</span>
+      <span class="go-info iconfont" @click="goCityList">城市列表</span>
     </topBar>
     <ul class="cinema">
       <li :class="[index % 2 == 0 ? 'even' : 'odd' ]" v-for="(item,index) in cinemaData" :key="index" @click="toIndexFilm(item._id)">
@@ -27,17 +27,13 @@ export default {
     return {
       loading:"",
       cinemaData: [],
-      college_id:""
+      city:""
     };
   },
   methods: {
     //获取影院列表
     getCinemaDate() {
-      let { college_id } = this.$route.query;
-      if (!college_id) return;
-      this.college_id = college_id;
-      localStorage.college_id = college_id;
-      getCinemaList({ college_id }).then(res => {
+      getCinemaList({ city:this.city }).then(res => {
         let { code, data, msg } = res;
         if (code == 0) {
           this.cinemaData = data;
@@ -51,20 +47,22 @@ export default {
     toIndexFilm(cinema_id){
       this.$router.push({
         name:"film-list",
-        query:{cinema_id,college_id:this.college_id}
+        query:{cinema_id}
       });
-      localStorage.cinema_id = cinema_id;
     },
     //去城市列表
     goCityList() {
       this.$router.push({
-        name: "college-list",
-        params:this.$route.query
+        name: "city-list"
       });
     }
   },
   mounted() {
-    this.getCinemaDate();
+    this.city = this.$route.query.city;
+    if (this.city){
+      this.getCinemaDate();
+    };
+    
   }
 };
 </script>
@@ -75,7 +73,8 @@ export default {
   background: #fff;
   .cinema li {
     background: #f3f3f3;
-    padding: 10px 15px;
+    padding: 13px 15px;
+    font-size: 14px;
   }
   .cinema .odd {
     background: #fff;

@@ -39,14 +39,34 @@ export const rmSameObj = (arr, key, obj) => {
 };
 
 /**
- * 时间戳转时间
+ * 移除重复数组对象
+ * @param {Array} arr 包含对象数组
+ * @param {String} key 要对比的键值
+ */
+export const rmSame = (arr,key) =>{
+  let obj = {};
+  return arr.reduce((v, next) => {
+    obj[next[key]] ? "" : (obj[next[key]] = true && v.push(next));
+    return v;
+  }, []);
+}
+
+/**
+ * 时间戳或时间格式导出
  * @param {string,string}
  * timeStamp 时间戳
  * format = YMD => 年-月-日 , Y=> 年 , M=>月 , D=>日 , YM => 年-月 , hms=> 时:分:秒 , YMDhms=> 年-月-日 时:分:秒 , YMDhm=> 年-月-日 时:分
  */
- export const stampToTime = (timeStamp, format= "YMDhms") => {
-    let getTimeStamp = timeStamp.length == 10 ? timeStamp * 1000 : timeStamp;
-    let oDate = new Date(getTimeStamp);
+ export const timeFormat = (timeStamp, format= "YMDhms") => {
+   let getDateTime = null;
+
+    if(isNaN(timeStamp*1)){
+      getDateTime = timeStamp;
+    }else{
+      getDateTime = timeStamp/10000000000 < 1 ? timeStamp* 1000 : timeStamp;
+    }
+   
+    let oDate = new Date(getDateTime);
     let Y = oDate.getFullYear();
     let M = toDouble(oDate.getMonth() + 1);
     let D = toDouble(oDate.getDate());
@@ -63,7 +83,8 @@ export const rmSameObj = (arr, key, obj) => {
       ["YM", `${Y}-${M}`],
       ["YMD", `${Y}-${M}-${D}`],
       ["YMDhms", `${Y}-${M}-${D} ${h}:${m}:${s}`],
-      ["YMDhm", `${Y}-${M}-${D} ${h}:${m}`]
+      ["YMDhm", `${Y}-${M}-${D} ${h}:${m}`],
+      ["Y$M$",`${Y}月${M}日`]
     ]);
     return oMap.get(format);
  }

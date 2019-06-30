@@ -1,100 +1,113 @@
 <template>
   <div id="film">
-    <!-- <div class="film-bg"></div> -->
-    <div class="film-content">
-      <div class="header">
-        <dl class="cinema-info">
-          <dt>{{collegeInfo.college_name}} {{collegeInfo.cinema_name}}</dt>
-          <dd>{{collegeInfo.address}}</dd>
-        </dl>
-        <span class="go-info iconfont" @click="goCityList">&#xe61f;</span>
-      </div>
-      <div v-if="hasFilm">
-        <div class="swipe-wrap">
-          <div class="swipe-slide" ref="swipeSlide">
-            <ul class="imgs clearfix" ref="imgs" style="-webkit-transform:translate3d(150px,0,0)">
-              <li
-                v-for="(item , index) in filmData"
-                :key="index"
-                :class="{active : index == filmiNow}"
-              >
-                <img :src="item.film_photo">
-              </li>
-            </ul>
-            <b class="center-mark"></b>
-          </div>
+    <mt-loadmore :top-method="loadTop" :bottom-all-loaded="allLoaded" :autoFill="false" ref="loadmore">
+      <!-- <div class="film-bg"></div> -->
+      <div class="film-content">
+        <div class="header" @click="goCityList">
+          <dl class="cinema-info">
+            <dt>{{cinemaInfo.cinema_name}}</dt>
+            <dd>{{cinemaInfo.address}}</dd>
+          </dl>
+          <span class="go-info iconfont">&#xe61f;</span>
         </div>
-
-        <div class="film-intro">
-          <h3>{{filmData[filmiNow].film_name}}</h3>
-          <p>{{filmData[filmiNow].film_long}}分钟 | {{filmData[filmiNow].film_type}} | {{filmData[filmiNow].actors}}</p>
-        </div>
-
-        <div class="film-info">
-          <div class="film-tag-bar">
-            <span :class="{active:playiNow == 0}" @click="playShow(0)">放映信息</span>
-            <span :class="{active:playiNow == 1}" @click="playShow(1)">影片介绍</span>
+        <div v-if="!hasPosCinema">
+          <div class="swipe-wrap">
+            <div class="swipe-slide" ref="swipeSlide">
+              <ul class="imgs clearfix" ref="imgs" style="-webkit-transform:translate3d(150px,0,0)">
+                <li
+                  v-for="(item , index) in filmData"
+                  :key="index"
+                  :class="{active : index == filmiNow}"
+                >
+                  <img :src="item.film_photo" />
+                </li>
+              </ul>
+              <b class="center-mark"></b>
+            </div>
           </div>
 
-          <div class="play-detail" v-show="playiNow == 0">
-            <ul>
-              <li v-for="(item , index) in filmData[filmiNow].children" :key="index">
-                <dl class="play-date">
-                  <dt>{{_stampToTime(item.start_datetime , "D")}}</dt>
-                  <dd>{{_stampToTime(item.start_datetime , "M")}}月</dd>
-                </dl>
-                <div class="item-detail">
-                  <div class="time-block">
-                    <div class="start-time">{{_stampToTime(item.start_datetime , "hm")}}</div>
-                    <div class="end-time">{{_stampToTime(item.end_datetime , "hm")}}散场</div>
-                  </div>
-                  <div class="screen-block" style="width:80px;">
-                    <div class="screen-name">{{item.screen_name}}</div>
-                    <div class="language">{{item.language}} {{item.screen_type}}</div>
-                  </div>
-                  <div class="price-block" style="width:65px;">
-                    <div class="price">
-                      特惠
-                      <br>
-                      {{item.sell_price}}元
+          <div class="film-intro">
+            <h3>{{filmData[filmiNow].film_name}}</h3>
+            <p>{{filmData[filmiNow].film_long}}分钟 | {{filmData[filmiNow].film_type}} | {{filmData[filmiNow].actors}}</p>
+          </div>
+
+          <div class="film-info">
+            <div class="film-tag-bar">
+              <span :class="{active:playiNow == 0}" @click="playShow(0)">放映信息</span>
+              <span :class="{active:playiNow == 1}" @click="playShow(1)">影片介绍</span>
+            </div>
+
+            <div class="play-detail" v-show="playiNow == 0">
+              <ul>
+                <li v-for="(item , index) in filmData[filmiNow].children" :key="index">
+                  <dl class="play-date">
+                    <dt>{{_stampToTime(item.start_datetime , "D")}}</dt>
+                    <dd>{{_stampToTime(item.start_datetime , "M")}}月</dd>
+                  </dl>
+                  <div class="item-detail">
+                    <div class="time-block">
+                      <div class="start-time">{{_stampToTime(item.start_datetime , "hm")}}</div>
+                      <div class="end-time">{{_stampToTime(item.end_datetime , "hm")}}散场</div>
+                    </div>
+                    <div class="screen-block" style="width:80px;">
+                      <div class="screen-name">{{item.screen_name}}</div>
+                      <div class="language">{{item.language}} {{item.screen_type}}</div>
+                    </div>
+                    <div class="price-block" style="width:65px;">
+                      <div class="price">
+                        特惠
+                        <br />
+                        {{item.sell_price}}元
+                      </div>
+                    </div>
+                    <div class="buy-block" @click="toSelectSeat(item.screen_id,item.session_id)">
+                      <div class="go-buy">购票</div>
                     </div>
                   </div>
-                  <div class="buy-block" @click="toSelectSeat">
-                    <div class="go-buy">购票</div>
-                  </div>
-                </div>
-              </li>
-            </ul>
+                </li>
+              </ul>
+            </div>
+            <div class="film-detail" v-show="playiNow == 1">{{filmData[filmiNow].brief}}</div>
           </div>
-          <div class="film-detail" v-show="playiNow == 1">{{filmData[filmiNow].brief}}</div>
+        </div>
+
+        <div v-if="hasPosCinema" class="has-pos-cinema">
+          <dl class="no-cinema">
+            <dt>
+              <span class="fail iconfont">&#xe620;</span>
+            </dt>
+            <dd>{{hasPosCinema}}</dd>
+          </dl>
         </div>
       </div>
-
-      <div v-if="!hasFilm" style="text-align:center; padding-top:30px;">
-        暂无排期
-      </div>
-    </div>
+    </mt-loadmore>
     <fixedFoot></fixedFoot>
     <loading :isShow="loading"></loading>
   </div>
 </template>
 
 <script>
+import Vue from 'vue'
 import fixedFoot from "@/components/fixedFooter/foot";
 import loading from "@/components/loading/loading";
-import { stampToTime, findInArr } from "@/utils/util";
+import { timeFormat, findInArr } from "@/utils/util";
 import { getIndexFilmList, getLocationCollege, getCinemaList } from "@/api/api";
 import "@/utils/geolocation.min";
+import { Loadmore } from 'mint-ui'
+Vue.component(Loadmore.name, Loadmore);
+
 export default {
   name: "film-list",
   components: {
     fixedFoot,
-    loading
+    loading,
+    Loadmore
   },
   data() {
     return {
+      allLoaded:false,
       loading: "",
-      hasFilm:true,
+      hasPosCinema: "", //是否定位到影院或是否有排期
       filmiNow: 0,
       playiNow: 0,
       filmData: [
@@ -114,32 +127,41 @@ export default {
               language: "",
               film_version: "",
               sell_price: 5,
-              play_id: ""
+              session_id: ""
             }
           ]
         }
       ],
-      collegeInfo: {
-        college_name: "",
-        address: "",
+      cinemaInfo: {
         cinema_name: "",
-        college_id: ""
+        address: "",
+        cinema_id: null //影院id
       }
     };
   },
   methods: {
+    loadTop() {
+      this.getFilmData();
+    },
+    loadBottom() {
+      // this.allLoaded = true;
+      // this.$refs.loadmore.onBottomLoaded();
+    },
     handleChange(index) {},
     //去城市列表
     goCityList() {
       this.$router.push({
-        name: "college-list",
-        params: this.collegeInfo
+        name: "city-list"
       });
     },
     //去座位图
-    toSelectSeat() {
+    toSelectSeat(screen_id, session_id) {
       this.$router.push({
-        name: "seat"
+        name: "seat",
+        query: {
+          screen_id,
+          session_id
+        }
       });
     },
     //放映信息 影片介绍
@@ -147,27 +169,32 @@ export default {
       this.playiNow = param;
     },
     //获取排期数据
-    getFilmData(cinema_id, college_id) {
-      getIndexFilmList({ cinema_id, college_id }).then(res => {
+    getFilmData() {
+      this.loading = true;
+      getIndexFilmList({ cinema_id: this.cinemaInfo.cinema_id }).then(res => {
         let { code, data, msg } = res;
         if (code == 0) {
           this.filmData = this.formatFilmData(data.session);
-          
+          this.cinemaInfo.cinema_name = data.info.cinema_name;
+          this.cinemaInfo.address = data.info.address;
         } else if (code == 1) {
-          this.hasFilm = false;
-        }else if(code == 2){
+          this.hasPosCinema = "暂无排期";
+          this.cinemaInfo.cinema_name = "请选择城其他影院";
+          this.cinemaInfo.address = "暂无数据";
+        } else if (code == 2) {
           this.$router.push({
-            name: "college-list"
+            name: "city-list"
           });
           return;
         }
-        this.collegeInfo = {
-            college_name: data.college_name,
-            address: data.address,
-            cinema_name: data.cinema_name,
-            college_id: college_id
-          };
-
+        // this.collegeInfo = {
+        //     college_name: data.college_name,
+        //     address: data.address,
+        //     cinema_name: data.cinema_name,
+        //     college_id: college_id
+        //   };
+        this.$refs.loadmore.onTopLoaded();
+        this.$refs.loadmore.onBottomLoaded();
         this.loading = false;
 
         //轮播图
@@ -250,7 +277,8 @@ export default {
             language: v.language,
             film_version: v.film_version,
             sell_price: v.sell_price,
-            play_id: v._id
+            session_id: v._id,
+            screen_id: v.screen_id
           }
         ];
 
@@ -266,76 +294,61 @@ export default {
     },
     //时间戳转时间
     _stampToTime(stamp, format) {
-      return stampToTime(stamp, format);
+      return timeFormat(stamp, format);
+    },
+    //定位
+    getPos() {
+      let _this = this;
+      let geolocation = new qq.maps.Geolocation(
+        "EZMBZ-A4MEX-MWA4L-T4MZK-66OO5-3OBTD",
+        "film"
+      );
+      geolocation.getLocation(
+        function(res) {
+          let { lat, lng } = res;
+
+          getLocationCollege({ lat, lng }).then(res => {
+            let { code, data, msg } = res;
+            if (code == 0) {
+              localStorage.cinema_id = _this.cinemaInfo.cinema_id = data._id;
+              _this.getFilmData();
+            } else {
+              //定位失败或没有定位学校
+              _this.hasPosCinema = "没有获取到附近影院";
+              _this.cinemaInfo.cinema_name = "请选择城市";
+              _this.cinemaInfo.address = "定位失败";
+            }
+            _this.loading = false;
+          });
+        },
+        function(err) {
+          //用户拒绝定位
+          _this.$router.push({
+            name: "college-list",
+            params: {
+              err: "定位失败"
+            }
+          });
+        }
+      );
     }
   },
+  created() {
+    this.cinemaInfo.cinema_id =
+      this.$route.query.cinema_id || localStorage.cinema_id;
+  },
   mounted() {
-    let { cinema_id, college_id } = this.$route.query;
-    //有cinema_id 获取数据
-    if (cinema_id) {
-      this.getFilmData(cinema_id, college_id);
-      return;
+    if (!this.cinemaInfo.cinema_id) {
+      this.getPos();
+    } else {
+      this.getFilmData();
     }
-    //否则获取定位学校
-    let _this = this;
-    let geolocation = new qq.maps.Geolocation(
-      "EZMBZ-A4MEX-MWA4L-T4MZK-66OO5-3OBTD",
-      "film"
-    );
-    geolocation.getLocation(
-      function(res) {
-        let { lat, lng } = res;
-
-        getLocationCollege({ latitude: lat, longitude: lng }).then(res => {
-          let { code, data, msg } = res;
-
-          if (code == 0) {
-            //用户位置没变，载入缓存地址
-            if (localStorage.college_id == data[0]._id) {
-              _this.getFilmData(localStorage.cinema_id, data[0]._id);
-              return;
-            }
-            //否则用户位置变了 从新定位新地址
-            _this.$router.push({
-              name: "cinema-list",
-              query: {
-                college_id: data[0]._id,
-                college_name: data[0].college_name
-              }
-            });
-          } else {
-            if (localStorage.college_id) {
-              _this.getFilmData(
-                localStorage.cinema_id,
-                localStorage.college_id
-              );
-              return;
-            }
-            //定位失败或没有定位学校
-            _this.$router.push({
-              name: "college-list",
-              params: {
-                err: msg
-              }
-            });
-          }
-        });
-      },
-      function(err) {
-        //用户拒绝定位
-        _this.$router.push({
-          name: "college-list",
-          params: {
-            err: "定位失败"
-          }
-        });
-      }
-    );
   }
 };
 </script>
 <style lang="less">
 @import "../../style/mixin";
+
 #film {
   padding-bottom: 40px;
   // .film-bg {
@@ -352,7 +365,10 @@ export default {
   //   transform: translate3d(0, 0, 0);
   //   .fullPos();
   // }
-  min-height: 100%;
+  -webkit-overflow-scrolling: touch;
+ overflow:auto;
+
+
   .film-content {
     background: @fff;
     z-index: 9;
@@ -370,11 +386,14 @@ export default {
       color: @deepColor;
     }
     .cinema-info {
+      width: 100%;
       dt {
         font-size: @bigSize;
       }
       dd {
         color: @lightColor;
+        width: 95%;
+        .textCut();
       }
     }
     .swipe-wrap {
@@ -511,6 +530,9 @@ export default {
         width: 75px;
         height: 100%;
       }
+      .time-block {
+        padding-left: 4px;
+      }
       .start-time {
         font-size: 20px;
         font-weight: 300;
@@ -587,6 +609,22 @@ export default {
   }
   .loading {
     .hzvc();
+  }
+  .has-pos-cinema {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 48px;
+    bottom: 46px;
+    background: #f4f4f4;
+  }
+  .no-cinema {
+    text-align: center;
+    padding-top: 40px;
+    .fail {
+      color: #ccc;
+      font-size: 60px;
+    }
   }
 }
 </style>

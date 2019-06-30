@@ -4,10 +4,12 @@
       <topBar></topBar>
       <div class="seat-top">
         <div class="film-name">
-          巨额来电
-          <langType class="ml">IMAX</langType>
+          {{filmInfo.film_name}}
+          <langType class="ml">{{filmInfo.film_version}}</langType>
         </div>
-        <div class="film-info">5月30日&nbsp;&nbsp;19:00&nbsp;&nbsp;国语</div>
+        <div
+          class="film-info"
+        >{{formatDate.month}}月{{formatDate.day}}号&nbsp;&nbsp;{{formatDate.h}}:{{formatDate.m}}&nbsp;&nbsp;{{filmInfo.language}}</div>
       </div>
     </div>
 
@@ -22,14 +24,14 @@
 
     <div class="seat-foot">
       <ul class="selected-box clearfix">
-        <li v-for="(v,idx) in selectedArr" :key="idx" @click="rmSelectSeat(v.id)">
+        <li v-for="(v,idx) in selectedArr" :key="idx" @click="rmSelectSeat(v._id)">
           <span>
             {{v.seat_row}}排{{v.seat_col}}座
             <i class="close-c iconfont">&#xe6d4;</i>
           </span>
         </li>
       </ul>
-      <button class="go-buy" :class="{disablebuy:!selectedArr.length}" @click="toGoBuy">立即购买</button>
+      <button class="go-buy" :class="{disablebuy:!selectedArr.length || isRepeatSubmit}" @click="toGoBuy">立即购买</button>
     </div>
   </div>
 </template>
@@ -38,7 +40,7 @@ import topBar from "@/components/topBar/topbar";
 import langType from "@/components/langType/lang-type";
 import { mDrag, rmSameObj } from "@/utils/util";
 import { Toast } from "mint-ui";
-import aaa from "../../../static/aaa.js";
+import { getSeat, placeOrder } from "@/api/api";
 
 export default {
   name: "seat",
@@ -48,13 +50,38 @@ export default {
   },
   data() {
     return {
-      list: aaa,
+      list: null,
       selectedArr: [], //已选座位
-      SEAT_STATUS: [0, 1, 2, 3, 4] //（0 可售、1 已售、2 锁定、3 不可售、4 已选）
+      SEAT_STATUS: [0, 1, 2, 3, 4], //（0 可售、1 已售、2 锁定、3 不可售、4 已选）
+      screen_id: null,
+      session_id: null,
+      filmInfo: {
+        film_name: "",
+        film_version: "",
+        start_datetime: "",
+        language: ""
+      },
+      formatDate: {},
+      isRepeatSubmit:true
     };
   },
   methods: {
-    drawSeat() {
+    getSeatData() {
+      getSeat({ screen_id: this.screen_id, _id: this.session_id }).then(res => {
+        let { code, msg, data } = res;
+        if (code == 0) {
+          let reDate = /(?<year>\d{4})-(?<month>\d{2})-(?<day>\d{2})\s(?<h>\d{2}):(?<m>\d{2})/;
+          let matchObj = reDate.exec(data.film_info.start_datetime);
+          this.drawSeat(data.seat);
+          this.list = data.seat;
+          this.filmInfo = data.film_info;
+          this.formatDate = matchObj.groups;
+        } else {
+          Toast(msg);
+        }
+      });
+    },
+    drawSeat(seatlist) {
       let _this = this;
       let oCanvas = this.$refs.seat;
       let ctx = oCanvas.getContext("2d");
@@ -86,53 +113,38 @@ export default {
         let maxRowArr = [];
 
         //渲染座位
-        _this.list.forEach(v => {
+        seatlist.forEach(v => {
           if (v.seat_status == 0) {
-            ctx.drawImage(
-              img0,
-              wr * (v.graph_col - 1),
-              hb * (v.graph_row - 1),
-              _w,
-              _h
-            );
+            ctx.drawImage(img0, wr * v.graph_col, hb * v.graph_row, _w, _h);
           }
           if (v.seat_status == 1 || v.seat_status == 2 || v.seat_status == 3) {
-            ctx.drawImage(
-              img1,
-              wr * (v.graph_col - 1),
-              hb * (v.graph_row - 1),
-              _w,
-              _h
-            );
+            ctx.drawImage(img1, wr * v.graph_col, hb * v.graph_row, _w, _h);
           }
           if (v.seat_status == 4) {
-            ctx.drawImage(
-              img4,
-              wr * (v.graph_col - 1),
-              hb * (v.graph_row - 1),
-              _w,
-              _h
-            );
+            ctx.drawImage(img4, wr * v.graph_col, hb * v.graph_row, _w, _h);
           }
           maxColArr.push(v.graph_col);
           maxRowArr.push(v.graph_row);
         });
 
         //计算座位图宽高
-        oMoveWarp.style.width = Math.max(...maxColArr) * wr + "px";
-        oMoveWarp.style.height = Math.max(...maxRowArr) * hb + "px";
-
+        let bodyWidth = document.body.offsetWidth;
+        let mapWidth = (Math.max(...maxColArr) + 1) * wr;
+        let mapHeight = (Math.max(...maxRowArr) + 1) * hb;
+        oMoveWarp.style.width = mapWidth + "px";
+        oMoveWarp.style.height = mapHeight + "px";
+        oMoveWarp.style.left = -(mapWidth - bodyWidth) / 2 - initAttr.r / 2 + "px";
+        
         //点选座位
         _this.selectSeat = function(ev) {
-
-          let x = Math.abs(ev.clientX)-getPos(oMoveWarp).l;
-          let y = Math.abs(ev.clientY)-getPos(oMoveWarp).t;
+          let x = Math.abs(ev.clientX) - getPos(oMoveWarp).l;
+          let y = Math.abs(ev.clientY) - getPos(oMoveWarp).t;
           let gc = null,
             gr = null,
             sumW = null,
             sumH = null;
- 
-          _this.list.forEach(v => {
+
+          seatlist.forEach(v => {
             if (
               v.seat_status == _this.SEAT_STATUS[1] ||
               v.seat_status == _this.SEAT_STATUS[2] ||
@@ -140,14 +152,19 @@ export default {
             )
               return;
 
-            gc = v.graph_col - 1;
-            gr = v.graph_row - 1;
+            gc = v.graph_col;
+            gr = v.graph_row;
             sumW = wr * gc;
             sumH = hb * gr;
-            
+
             //座位图点选座位
-            if (typeof ev == "object" && x > sumW && x < sumW + _w && y > sumH && y < sumH + _h) {
-          
+            if (
+              typeof ev == "object" &&
+              x > sumW &&
+              x < sumW + _w &&
+              y > sumH &&
+              y < sumH + _h
+            ) {
               //已选和取选
               if (v.seat_status == 0) {
                 if (_this.selectedArr.length >= 4) {
@@ -155,38 +172,37 @@ export default {
                   return;
                 }
                 _this.selectedArr.push(v);
-                
+
                 ctx.drawImage(img4, sumW, sumH, _w, _h);
-               
+
                 v.seat_status = _this.SEAT_STATUS[4];
               } else if (v.seat_status == 4) {
                 ctx.drawImage(img0, sumW, sumH, _w, _h);
                 v.seat_status = _this.SEAT_STATUS[0];
-                rmSameObj(_this.selectedArr, "id", v);
+                rmSameObj(_this.selectedArr, "_id", v);
               }
             }
 
             //点选座号删除
-            if(typeof (ev+"") == "string" && v.id == ev){
-                ctx.drawImage(img0, sumW, sumH, _w, _h);
-                v.seat_status = _this.SEAT_STATUS[0];
+            if (typeof (ev + "") == "string" && v._id == ev) {
+              ctx.drawImage(img0, sumW, sumH, _w, _h);
+              v.seat_status = _this.SEAT_STATUS[0];
             }
           });
-
         };
 
-         function getPos(obj){
-            var top=0;
-            var left=0;
-            
-            while(obj){
-              top+=obj.offsetTop;
-              left+=obj.offsetLeft;
-              obj = obj.offsetParent;
-            }
-            
-            return {l:left,t:top};
+        function getPos(obj) {
+          var top = 0;
+          var left = 0;
+
+          while (obj) {
+            top += obj.offsetTop;
+            left += obj.offsetLeft;
+            obj = obj.offsetParent;
           }
+
+          return { l: left, t: top };
+        }
 
         oCanvas.addEventListener("click", _this.selectSeat);
 
@@ -202,27 +218,38 @@ export default {
     },
     //点选座号删除座位
     rmSelectSeat(id) {
-      let _del = rmSameObj(this.selectedArr, "id", id);
+      let _del = rmSameObj(this.selectedArr, "_id", id);
       this.list.forEach(v => {
-        if (v.id == _del[0].id) {
+        if (v._id == _del[0]._id) {
           this.selectSeat(id);
         }
       });
     },
     //去下单
-    toGoBuy(){
-      if(this.selectedArr.length){
-        this.$router.push({
-          name:"order-detail",
-          params:{
-            id:1
+    toGoBuy() {
+      if (this.selectedArr.length || this.isRepeatSubmit) {
+        this.isRepeatSubmit = false;
+        let seat_id = this.selectedArr.map(v => v._id);
+        placeOrder({ session_id: this.session_id, seat_id }).then(res => {
+          let { code, data, msg } = res;
+          if (code == 0) {
+            this.$router.push({
+              name: "order-detail",
+              params:data
+            });
+          }else{
+            Toast(msg);
           }
-        });  
+          this.isRepeatSubmit = true;
+        });
       }
     }
   },
   mounted() {
-    this.drawSeat();
+    let { screen_id, session_id } = this.$route.query;
+    this.screen_id = screen_id;
+    this.session_id = session_id;
+    this.getSeatData();
   }
 };
 </script>
@@ -305,7 +332,7 @@ export default {
   }
   .move-wrap {
     position: absolute;
-    top: 20px;
+    top: 40px;
   }
   .selected-box {
     li {
@@ -332,6 +359,8 @@ export default {
     right: -5px;
     top: -11px;
   }
-  .disablebuy{ opacity: 0.6;}
+  .disablebuy {
+    opacity: 0.6;
+  }
 }
 </style>

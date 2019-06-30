@@ -35,6 +35,7 @@ export default {
 </script>
 <style lang="less">
 @import "./style/common";
+@import "./style/font-icons/iconfont.css";
 .slide-in-enter-active,
 .slide-in-leave-active,
 .slide-out-enter-active,

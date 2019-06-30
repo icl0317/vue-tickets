@@ -2,7 +2,7 @@ import Vue from "vue";
 import Router from "vue-router";
 import App from "../App";
 import filmList from "@/views/film/index";
-import collegeList from "@/views/film/college-list/college-list";
+import cityList from "@/views/film/city-list/city-list";
 import cinemaList from "@/views/film/cinema-list/cinema-list";
 import news from "@/views/find/news";
 import newsDetail from "@/views/find/news-detail/detail";
@@ -24,10 +24,10 @@ export default new Router({
       }
     },
     {
-      path: "/college-list",
+      path: "/city-list",
       title: "学校列表",
-      name: "college-list",
-      component: collegeList,
+      name: "city-list",
+      component: cityList,
       meta: {
         deepPath: 2
       }

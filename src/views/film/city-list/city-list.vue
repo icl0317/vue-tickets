@@ -21,11 +21,11 @@
         <span class="city-name">深圳</span>
       </dd>
     </dl>-->
-    <dl class="city-list" v-for="(item,index) in colleges" :key="index">
+    <dl class="city-list" v-for="(item,index) in formatCity" :key="index">
       <dt>{{item.province}}</dt>
       <dd>
         <div class="citys" v-for="(v,idx) in item.children" :key="idx">
-          <router-link :to="'/cinema-list?college_id='+v._id">{{v.college_name}}</router-link>
+          <router-link :to="'/cinema-list?city='+v.city">{{v.city}}</router-link>
         </div>
       </dd>
     </dl>
@@ -36,8 +36,8 @@
 <script>
 import topBar from "@/components/topBar/topbar";
 import loading from "@/components/loading/loading";
-import { getCollegeList } from "@/api/api";
-import { findInArr } from "@/utils/util";
+import { getCityList } from "@/api/api";
+import { findInArr, rmSame } from "@/utils/util";
 export default {
   name: "",
   components: {
@@ -48,37 +48,18 @@ export default {
     return {
       sValue: "",
       loading:"",
-      colleges: [], //學校列表
+      citys: [], //城市列表
       locationCollege: "",
       locationCollegeId: ""
     };
   },
   methods: {
-    getCollegeData() {
-      getCollegeList().then(res => {
+    getCityData() {
+      this.loading=true;
+      getCityList().then(res => {
         let { code, msg, data } = res;
         if(code == 0){
-          let arr = [];
-          data.forEach(v => {
-            let json = {};
-            json.province = v.province;
-            json.children = [
-              {
-                _id: v._id,
-                college_name: v.college_name,
-                city: v.city,
-                address: v.address
-              }
-            ];
-            if (findInArr(arr, json, "province") == -1) {
-              arr.push(json);
-            } else {
-              arr[findInArr(arr, json, "province")].children = arr[
-                findInArr(arr, json, "province")
-              ].children.concat(json.children);
-            }
-          });
-          this.colleges = arr;
+          this.citys = rmSame(data,'city');
         }else{
           Toast(msg);
         }
@@ -95,12 +76,35 @@ export default {
       });
     }
   },
+  computed:{
+    //城市列表数据格式转换
+    formatCity:function(){
+      let arr = [];
+      this.citys.forEach(v => {
+        let json = {};
+        json.province = v.province.split(',')[0];
+        json.children = [
+          {
+            _id: v._id,
+            city: v.city.split(',')[0]
+          }
+        ];
+        if (findInArr(arr, json, "province") == -1) {
+          arr.push(json);
+        } else {
+          arr[findInArr(arr, json, "province")].children = arr[
+            findInArr(arr, json, "province")
+          ].children.concat(json.children);
+        }
+      });
+      return arr;
+    }
+  },
   mounted() {
     let { college_name, college_id, err } = this.$route.params;
     this.locationCollege = college_name || err;
     this.locationCollegeId = college_id;
-    console.log();
-    this.getCollegeData();
+    this.getCityData();
   }
 };
 </script>
@@ -135,7 +139,8 @@ export default {
       margin: 0 5px 0 0;
     }
     .citys {
-      padding: 8px 0;
+      
+      a{ display: block; padding: 8px 0;}
     }
   }
   .city-list {
