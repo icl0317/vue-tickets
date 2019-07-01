@@ -51,7 +51,7 @@ export default new Router({
       }
     },
     {
-      path: "/news/detail/:id",
+      path: "/news/detail",
       title: "发现详情",
       name: "detail",
       component: newsDetail,

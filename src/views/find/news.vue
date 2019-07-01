@@ -2,15 +2,15 @@
   <div id="news">
     <div class="news-block" v-for="(item,index) in list" :key="index">
       <div class="date">{{item.release_date | YMD}}</div>
-      <div class="new-pic" @click="inDetail">
+      <div class="new-pic" @click="inDetail(item._id)">
         <img :src="item.img_url" width="100%">
       </div>
-      <h3 class="news-title" @click="inDetail">{{item.title}}</h3>
+      <h3 class="news-title" @click="inDetail(item._id)">{{item.title}}</h3>
       <div
         class="news-intro"
       >{{item.brief}}</div>
       <div class="cont">
-        <div class>阅读：{{item.views}} 点赞：{{item.like}}</div>
+        <div class>阅读：{{item.views}}&nbsp;&nbsp;点赞：{{item.like}}</div>
       </div>
     </div>
     <fixedFoot></fixedFoot>
@@ -48,11 +48,11 @@ export default {
         this.loading = false;
       })
     },
-    inDetail() {
+    inDetail(_id) {
       this.$router.push({
         name: "detail",
-        params:{
-          id:1
+        query:{
+          _id
         }
       });
     }

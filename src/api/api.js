@@ -27,6 +27,14 @@ export function placeOrder (params = {}){
 export function getFindNew (params = {}){
     return Get("/api/getFindNew", params);
 }
+//新闻详情
+export function getFindDetail (params = {}){
+    return Get("/api/getFindDetail", params);
+}
+//新闻点赞
+export function like (params = {}){
+    return Post("/api/like", params);
+}
 
 
 

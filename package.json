@@ -11,6 +11,7 @@
     "build": "node build/build.js"
   },
   "dependencies": {
+    "js-cookie": "^2.2.0",
     "lib-flexible": "^0.3.2",
     "mint-ui": "^2.2.13",
     "vue": "^2.5.2",
