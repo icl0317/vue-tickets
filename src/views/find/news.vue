@@ -13,6 +13,7 @@
         <div class>阅读：{{item.views}}&nbsp;&nbsp;点赞：{{item.like}}</div>
       </div>
     </div>
+    <div style="height:46px;"></div>
     <fixedFoot></fixedFoot>
     <loading :isShow="loading"></loading>
   </div>
@@ -74,7 +75,6 @@ export default {
   background: #f3f3f3;
   min-height: 100%;
   padding-top: 10px;
-  margin-bottom: 46px;
   .news-block {
     padding: 10px 15px;
     background: #fff;

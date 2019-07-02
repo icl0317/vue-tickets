@@ -9,6 +9,8 @@ import newsDetail from "@/views/find/news-detail/detail";
 import seat from "@/views/seat/seat";
 import orderDetail from "@/views/order/detail/order-detail";
 import my from "@/views/my/my";
+import login from "@/views/login";
+
 Vue.use(Router);
 
 export default new Router({
@@ -82,6 +84,15 @@ export default new Router({
       title: "我的",
       name: "my",
       component: my,
+      meta: {
+        deepPath: 0
+      }
+    },
+    {
+      path: "/login",
+      name: "login",
+      title: "登录",
+      component: login,
       meta: {
         deepPath: 0
       }

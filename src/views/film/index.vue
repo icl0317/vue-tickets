@@ -1,6 +1,6 @@
 <template>
   <div id="film">
-    <mt-loadmore :top-method="loadTop" :bottom-all-loaded="allLoaded" :autoFill="false" ref="loadmore">
+   
       <!-- <div class="film-bg"></div> -->
       <div class="film-content">
         <div class="header" @click="goCityList">
@@ -80,7 +80,7 @@
           </dl>
         </div>
       </div>
-    </mt-loadmore>
+    
     <fixedFoot></fixedFoot>
     <loading :isShow="loading"></loading>
   </div>
@@ -140,14 +140,6 @@ export default {
     };
   },
   methods: {
-    loadTop() {
-      this.getFilmData();
-    },
-    loadBottom() {
-      // this.allLoaded = true;
-      // this.$refs.loadmore.onBottomLoaded();
-    },
-    handleChange(index) {},
     //去城市列表
     goCityList() {
       this.$router.push({
@@ -193,8 +185,7 @@ export default {
         //     cinema_name: data.cinema_name,
         //     college_id: college_id
         //   };
-        this.$refs.loadmore.onTopLoaded();
-        this.$refs.loadmore.onBottomLoaded();
+
         this.loading = false;
 
         //轮播图
@@ -365,9 +356,6 @@ export default {
   //   transform: translate3d(0, 0, 0);
   //   .fullPos();
   // }
-  -webkit-overflow-scrolling: touch;
- overflow:auto;
-
 
   .film-content {
     background: @fff;

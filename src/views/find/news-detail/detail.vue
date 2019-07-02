@@ -61,13 +61,21 @@ export default {
     },
     //点赞
     goodLike(_id){
-      let getLike = Cookies.get('likes');
+      let getLike = Cookies.get('likes') || '';
       let status  = this.isClikcLike ? -1 : 1;
       like({_id,status}).then(res=>{
         let {data,code,msg} = res;
         if(code == 0){
           if(status == 1){
             Cookies.set('likes', `${getLike}${_id},`, { expires: 1, path: '' });
+            this.articleDetail.like += 1; 
+            this.isClikcLike = true;
+          }else if(status == -1){
+            let re =new RegExp(`${_id},`);
+            getLike = getLike.replace(re,'');
+            Cookies.set('likes', `${getLike},`, { expires: 1, path: '' });
+            this.articleDetail.like -= 1;
+            this.isClikcLike = false;
           }
 
         }
@@ -93,15 +101,14 @@ export default {
 <style lang="less">
 @import "../../../style/mixin";
 #news-detail{
-  .title{ font-size: @normalSize; font-weight: 600;}
-  .article{ padding: 10px; line-height: 20px;
+  .title{ font-size: @bigSize; font-weight: 600;}
+  .article{ padding: 14px; line-height: 20px; font-size: @normalSize;
     img{ max-width: 100%;}
   }
-  .title{ padding: 10px 10px 5px;}
-  .date{ padding: 0 10px;}
-  .mutual{ display: flex; justify-content: space-between; padding: 0 10px 10px ;}
+  .title{ padding: 14px 14px 5px;}
+  .date{ padding: 0 14px;}
+  .mutual{ display: flex; justify-content: space-between; padding: 0 14px 14px ; }
   .good{ color: #777; font-style: normal;}
   .liked{ color: #f00;}
 }
-
 </style>
