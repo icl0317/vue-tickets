@@ -1,6 +1,7 @@
 import Vue from "vue";
 import Router from "vue-router";
 import App from "../App";
+import store from "@/store/store"
 import filmList from "@/views/film/index";
 import cityList from "@/views/film/city-list/city-list";
 import cinemaList from "@/views/film/cinema-list/cinema-list";
@@ -13,7 +14,7 @@ import login from "@/views/login";
 
 Vue.use(Router);
 
-export default new Router({
+const router = new Router({
   //mode: "history",
   routes: [
     {
@@ -99,3 +100,19 @@ export default new Router({
     }
   ]
 });
+
+router.beforeEach((to, from, next) => {
+  
+  if(!store.state.piaoToken){
+    if (to.path === '/login') { // 如果是登录页面的话，直接next()
+      next();
+    } else { // 否则 跳转到登录页面
+      next({
+        path: '/login'
+      });
+    }
+  }
+  next();
+})
+
+export default router;

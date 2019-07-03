@@ -35,6 +35,9 @@ export function getFindDetail (params = {}){
 export function like (params = {}){
     return Post("/api/like", params);
 }
-
+//登录
+export function userLogin (params = {}){
+    return Post("/api/userLogin", params);
+}
 
 

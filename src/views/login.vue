@@ -4,21 +4,40 @@
       <i class="logo iconfont">&#xe600;</i>
     </div>
     <ul class="login-form">
-        <li><input type="text" name="" class="text" placeholder="手机号/会员名"></li>
-        <li><input type="password" name="" class="text" placeholder="请输入密码"></li>
-        <li style="padding-top:20px;"><button type="button" class="loginbtn">登 录</button></li>
+        <li><input type="text" name="" class="text" v-model="loginInfo.username" placeholder="手机号/会员名"></li>
+        <li><input type="text" name="" class="text" v-model="loginInfo.password" placeholder="请输入密码"></li>
+        <li style="padding-top:20px;"><button type="button" class="loginbtn" @click="login">登 录</button></li>
     </ul>
   </div>
 </template>
 <script>
+import { userLogin } from '@/api/api';
+import { Toast } from 'mint-ui';
+import Cookies from 'js-cookie';
 export default {
   data() {
     return {
-     
+      loginInfo:{
+        username:'cl',
+        password:'123456'
+      }
     }
   },
   methods:{
-   
+   login(){
+     userLogin(this.loginInfo).then(res=>{
+       let {data,code,msg} = res;
+       if(code == 0){
+         Cookies.set('piao_token',data.token,{ expires: 1 })
+         this.$store.state.piaoToken = data.token;
+         this.$router.push({
+           name:'film-list'
+         })
+       }else{
+         Toast(msg);
+       }
+     })
+   }
   },
   mounted(){
     
