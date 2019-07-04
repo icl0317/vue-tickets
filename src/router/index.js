@@ -68,7 +68,8 @@ const router = new Router({
       name: "seat",
       component: seat,
       meta: {
-        deepPath: 1
+        deepPath: 1,
+        needLogin:true
       }
     },
     {
@@ -102,7 +103,6 @@ const router = new Router({
 });
 
 router.beforeEach((to, from, next) => {
-  
   if(!store.state.piaoToken){
     if (to.path === '/login') { // 如果是登录页面的话，直接next()
       next();

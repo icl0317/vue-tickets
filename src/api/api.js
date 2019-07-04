@@ -1,3 +1,7 @@
+/**
+ * 前台api needLogin = true 需要登录权限才可访问
+ */
+
 import {Post, Get} from "./http"
 //获取城市列表
 export function getCityList (params = {}){
@@ -15,7 +19,7 @@ export function getIndexFilmList (params = {}){
 export function getLocationCollege (params = {}){
     return Get("/api/getLocationCollege", params);
 }
-//获取影片座位
+//获取影片座位 
 export function getSeat (params = {}){
     return Get("/api/getSeat", params);
 }
