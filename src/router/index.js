@@ -2,6 +2,8 @@ import Vue from "vue";
 import Router from "vue-router";
 import App from "../App";
 import store from "@/store/store"
+import { Toast } from 'mint-ui';
+
 import filmList from "@/views/film/index";
 import cityList from "@/views/film/city-list/city-list";
 import cinemaList from "@/views/film/cinema-list/cinema-list";
@@ -73,7 +75,7 @@ const router = new Router({
       }
     },
     {
-      path: "/order/detail/:id",
+      path: "/order/detail",
       title: "订单详情",
       name: "order-detail",
       component: orderDetail,
@@ -103,14 +105,19 @@ const router = new Router({
 });
 
 router.beforeEach((to, from, next) => {
-  if(!store.state.piaoToken){
+  //需要登录权限页面 并 没有token
+  if(to.meta.needLogin && !store.state.piaoToken){
     if (to.path === '/login') { // 如果是登录页面的话，直接next()
       next();
     } else { // 否则 跳转到登录页面
-      next({
-        path: '/login'
-      });
+      Toast('请先登录');
+      setTimeout(() => {
+        next({
+          path: '/login'
+        });
+      }, 2000);
     }
+    return;
   }
   next();
 })

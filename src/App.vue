@@ -60,4 +60,5 @@ export default {
 .slide-out-leave-active {
   transform: translateX(101%);
 }
+.iconcaozuochenggong{ font-size: 30px!important;}
 </style>

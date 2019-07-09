@@ -21,11 +21,23 @@ export function getLocationCollege (params = {}){
 }
 //获取影片座位 
 export function getSeat (params = {}){
-    return Get("/api/getSeat", params);
+    return Get("/api/getSeat", {...params,needLogin:true});
 }
 //下单
 export function placeOrder (params = {}){
-    return Post("/api/placeOrder", params);
+    return Post("/api/placeOrder", {...params,needLogin:true});
+}
+//订单详情
+export function orderDetail (params = {}){
+    return Get("/api/orderDetail", {...params,needLogin:true});
+}
+//取消订单
+export function cancelOrder (params = {}){
+    return Post("/api/cancelOrder", {...params,needLogin:true});
+}
+//支付订单
+export function payOrder (params = {}){
+    return Post("/api/payOrder", {...params,needLogin:true});
 }
 //新闻
 export function getFindNew (params = {}){

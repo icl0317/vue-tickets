@@ -31,25 +31,32 @@
           </span>
         </li>
       </ul>
-      <button class="go-buy" :class="{disablebuy:!selectedArr.length || isRepeatSubmit}" @click="toGoBuy">立即购买</button>
+      <button
+        class="go-buy"
+        :class="{disablebuy:!selectedArr.length && isRepeatSubmit}"
+        @click="toGoBuy"
+      >立即购买</button>
     </div>
+    <loading :isShow="loading"></loading>
   </div>
 </template>
 <script>
 import topBar from "@/components/topBar/topbar";
 import langType from "@/components/langType/lang-type";
 import { mDrag, rmSameObj } from "@/utils/util";
-import { Toast } from "mint-ui";
+import { Toast, Indicator } from "mint-ui";
 import { getSeat, placeOrder } from "@/api/api";
-
+import loading from "@/components/loading/loading";
 export default {
   name: "seat",
   components: {
     topBar,
-    langType
+    langType,
+    loading
   },
   data() {
     return {
+      loading: true,
       list: null,
       selectedArr: [], //已选座位
       SEAT_STATUS: [0, 1, 2, 3, 4], //（0 可售、1 已售、2 锁定、3 不可售、4 已选）
@@ -62,11 +69,12 @@ export default {
         language: ""
       },
       formatDate: {},
-      isRepeatSubmit:true
+      isRepeatSubmit: true
     };
   },
   methods: {
     getSeatData() {
+      this.loading = true;
       getSeat({ screen_id: this.screen_id, _id: this.session_id }).then(res => {
         let { code, msg, data } = res;
         if (code == 0) {
@@ -79,6 +87,7 @@ export default {
         } else {
           Toast(msg);
         }
+        this.loading = false;
       });
     },
     drawSeat(seatlist) {
@@ -133,8 +142,9 @@ export default {
         let mapHeight = (Math.max(...maxRowArr) + 1) * hb;
         oMoveWarp.style.width = mapWidth + "px";
         oMoveWarp.style.height = mapHeight + "px";
-        oMoveWarp.style.left = -(mapWidth - bodyWidth) / 2 - initAttr.r / 2 + "px";
-        
+        oMoveWarp.style.left =
+          -(mapWidth - bodyWidth) / 2 - initAttr.r / 2 + "px";
+
         //点选座位
         _this.selectSeat = function(ev) {
           let x = Math.abs(ev.clientX) - getPos(oMoveWarp).l;
@@ -227,29 +237,38 @@ export default {
     },
     //去下单
     toGoBuy() {
-      if (this.selectedArr.length || this.isRepeatSubmit) {
-        this.isRepeatSubmit = false;
+      if (this.selectedArr.length && this.isRepeatSubmit) {
+        this.isRepeatSubmit = false; //节流
         let seat_id = this.selectedArr.map(v => v._id);
+        Indicator.open({
+          text: "提交订单..."
+        });
         placeOrder({ session_id: this.session_id, seat_id }).then(res => {
           let { code, data, msg } = res;
           if (code == 0) {
             this.$router.push({
               name: "order-detail",
-              params:data
+              query: {
+                order_id:data.order_id
+              }
             });
-          }else{
+          } else {
             Toast(msg);
           }
+          Indicator.close();
           this.isRepeatSubmit = true;
         });
       }
     }
   },
-  mounted() {
+  created(){
     let { screen_id, session_id } = this.$route.query;
     this.screen_id = screen_id;
     this.session_id = session_id;
     this.getSeatData();
+  },
+  mounted() {
+    
   }
 };
 </script>

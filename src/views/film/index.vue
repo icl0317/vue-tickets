@@ -87,21 +87,17 @@
 </template>
 
 <script>
-import Vue from 'vue'
 import fixedFoot from "@/components/fixedFooter/foot";
 import loading from "@/components/loading/loading";
 import { timeFormat, findInArr } from "@/utils/util";
 import { getIndexFilmList, getLocationCollege, getCinemaList } from "@/api/api";
 import "@/utils/geolocation.min";
-import { Loadmore } from 'mint-ui'
-Vue.component(Loadmore.name, Loadmore);
 
 export default {
   name: "film-list",
   components: {
     fixedFoot,
-    loading,
-    Loadmore
+    loading
   },
   data() {
     return {
@@ -148,6 +144,7 @@ export default {
     },
     //去座位图
     toSelectSeat(screen_id, session_id) {
+      
       this.$router.push({
         name: "seat",
         query: {

@@ -35,7 +35,7 @@
       <span></span>
       <span></span>
     </div>
-    <p style="position:fixed; width:100%; text-align:center; top:54%; transform:translateY(-50%)">努力加载中..</p>
+    <p style="position:fixed; width:100%; text-align:center; top:51%; transform:translateY(-50%)">努力加载中..</p>
   </div>
   </transition>
 </template>
@@ -59,6 +59,9 @@ export default {
 <style lang="less" scoped>
 @import "../../style/mixin";
 #al{
+  .loading{
+    text-align: center;
+  }
   .loading span {
     display: inline-block;
     width: 4px;

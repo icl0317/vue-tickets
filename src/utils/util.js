@@ -60,8 +60,8 @@ export const rmSame = (arr,key) =>{
  export const timeFormat = (timeStamp, format= "YMDhms") => {
    let getDateTime = null;
 
-    if(isNaN(timeStamp*1)){
-      getDateTime = timeStamp;
+    if(isNaN(timeStamp*1) && timeStamp != undefined){
+      getDateTime = timeStamp.replace(/-/g,'/');
     }else{
       getDateTime = timeStamp/10000000000 < 1 ? timeStamp* 1000 : timeStamp;
     }
@@ -78,17 +78,29 @@ export const rmSame = (arr,key) =>{
       ["M", M],
       ["D", D],
       ["h", h],
+      ["m", m],
       ["hm", `${h}:${m}`],
       ["hms", `${h}:${m}:${s}`],
       ["YM", `${Y}-${M}`],
       ["YMD", `${Y}-${M}-${D}`],
       ["YMDhms", `${Y}-${M}-${D} ${h}:${m}:${s}`],
       ["YMDhm", `${Y}-${M}-${D} ${h}:${m}`],
-      ["Y$M$",`${Y}月${M}日`]
+      ["Y$M$D$",`${Y}年${M}月${D}日`],
+      ["Y$M$",`${Y}年${M}月`],
+      ["M$D$",`${M}月${D}日`],
+      ["m$s$",`${m}分${s}秒`]
     ]);
     return oMap.get(format);
  }
 
+ /**
+  * 时间转时间戳
+  * @param { Date } 日期时间 
+  */
+export const dateTime2Stamp = dateTime => {
+  dateTime.replace(/-/,'/');
+  return new Date(dateTime).getTime()
+};
  /**
  * 小于10前位补0
  * @param {number}
