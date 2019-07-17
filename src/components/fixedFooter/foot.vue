@@ -75,9 +75,9 @@ export default {
       }
     }
     .router-link-active {
-      color: @deepColor;
+      color: @errorColor;
       span {
-        color: @deepColor;
+        color: @errorColor;
       }
     }
   }

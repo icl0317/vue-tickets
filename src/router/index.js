@@ -12,7 +12,9 @@ import newsDetail from "@/views/find/news-detail/detail";
 import seat from "@/views/seat/seat";
 import orderDetail from "@/views/order/detail/order-detail";
 import my from "@/views/my/my";
+import tickets from "@/views/my/tickets/tickets";
 import login from "@/views/login";
+import reg from "@/views/reg";
 
 Vue.use(Router);
 
@@ -93,12 +95,30 @@ const router = new Router({
       }
     },
     {
+      path: "/my/tickets",
+      title: "我的影票",
+      name: "tickets",
+      component: tickets,
+      meta: {
+        deepPath: 1
+      }
+    },
+    {
       path: "/login",
       name: "login",
       title: "登录",
       component: login,
       meta: {
         deepPath: 0
+      }
+    },
+    {
+      path: "/reg",
+      name: "reg",
+      title: "注册",
+      component: reg,
+      meta: {
+        deepPath: 1
       }
     }
   ]
@@ -110,6 +130,7 @@ router.beforeEach((to, from, next) => {
     if (to.path === '/login') { // 如果是登录页面的话，直接next()
       next();
     } else { // 否则 跳转到登录页面
+      
       Toast('请先登录');
       setTimeout(() => {
         next({

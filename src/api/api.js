@@ -55,5 +55,9 @@ export function like (params = {}){
 export function userLogin (params = {}){
     return Post("/api/userLogin", params);
 }
+//注册
+export function userReg (params = {}){
+    return Post("/api/userReg", params);
+}
 
 

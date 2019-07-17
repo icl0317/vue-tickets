@@ -1,10 +1,18 @@
 <template>
   <div id="my">
-    <div class="my-list">
-      <ul>
-        <li><span class="go-in iconfont">&#xe61f;</span>我的影票</li>
-        <li></li>
-      </ul>
+    <div class="user-info">
+      <dl class="user">
+        <dt><img src="../../images/default_photo.png" width="46" height="46"></dt>
+        <dd>cc</dd>
+      </dl>
+      <div class="my-list">
+        <ul>
+          <li @click="goTickets">
+            <span class="go-in iconfont">&#xe61f;</span><span class="my-icon iconfont">&#xe694;</span>电影票
+          </li>
+          <li></li>
+        </ul>
+      </div>
     </div>
     <fixedFoot></fixedFoot>
   </div>
@@ -20,7 +28,11 @@ export default {
     return {};
   },
   methods: {
-  
+    goTickets(){
+      this.$router.push({
+        name:'tickets'
+      });
+    }
   }
 };
 </script>
@@ -28,21 +40,40 @@ export default {
 <style lang="less" scoped>
 @import "../../style/mixin";
 #my {
-  background:#f5f5f5;
+  background: #f5f5f5;
   height: 100%;
-  .my-list{ padding: 10px 0;
-    ul{
-      background: #fff;
-      padding: 0 0 0 15px;
+  .user-info {
+    background: @errorColor;
+    height: 80px;
+    .borderRadius(0 0 10px 10px);
+  }
+  .user{
+    padding: 10px 15px ;
+    overflow: hidden;
+    dt { float: left; margin-right: 10px;}
+    dd{ font-size: 24px; color: @fff; margin-top: 5px;}
+  }
+  .my-list {
+    padding: 0 10px 0;
+    ul {
+      background: @fff;
+      .borderRadius(5px);
     }
-    li{
+    li {
       height: 40px;
       line-height: 40px;
       border-bottom: 1px solid @ddd;
       font-size: @normalSize;
     }
-    li:last-child{ border: none;}
-    .go-in{ float: right; color: @lightColor; margin-right: 10px;}
+    li:last-child {
+      border: none;
+    }
+    .go-in {
+      float: right;
+      color: @lightColor;
+      margin-right: 10px;
+    }
   }
+  .my-icon{ margin: 0 5px 0 10px; font-size: 18px; vertical-align: middle;}
 }
 </style>

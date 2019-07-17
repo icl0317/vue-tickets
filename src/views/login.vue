@@ -7,6 +7,7 @@
         <li><input type="text" name="" class="text" v-model="loginInfo.username" placeholder="手机号/会员名"></li>
         <li><input type="text" name="" class="text" v-model="loginInfo.password" placeholder="请输入密码"></li>
         <li style="padding-top:20px;"><button type="button" class="loginbtn" @click="login">登 录</button></li>
+        <li class="to-right"><router-link to="/reg">还没账号？去注册</router-link></li>  
     </ul>
   </div>
 </template>
@@ -18,8 +19,8 @@ export default {
   data() {
     return {
       loginInfo:{
-        username:'cl',
-        password:'123456'
+        username:'',
+        password:''
       }
     }
   },
@@ -29,7 +30,9 @@ export default {
        let {data,code,msg} = res;
        if(code == 0){
          Cookies.set('piao_token',data.token,{ expires: 1 })
+         Cookies.set('piao_username',data.username,{ expires: 1 })
          this.$store.state.piaoToken = data.token;
+         this.$store.state.piao_username = data.username;
          this.$router.push({
            name:'film-list'
          })
@@ -60,6 +63,7 @@ export default {
       width: 80%;
       margin: auto;
       li{ text-align: center; margin-bottom: 20px;}
+      .to-right { text-align: right;}
   }
   .login-form .text{
       height: 40px;
@@ -72,5 +76,6 @@ export default {
       font-size: @bigSize;
   }
   .loginbtn{ border: none; width: 100%; height: 40px; background: #66b1ff; .borderRadius(4px); font-size: @bigSize; color: @fff;}
+  
 }
 </style>

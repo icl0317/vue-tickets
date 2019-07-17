@@ -6,7 +6,8 @@ Vue.use(Vuex)
 
 const store = new Vuex.Store({
     state:{
-        piaoToken:Cookies.get('piao_token')
+        piaoToken:Cookies.get('piao_token'),
+        piaoUserName:Cookies.get('piao_username'),
     }
 })
 
