@@ -1,7 +1,7 @@
 <template>
   <div id="order-detail">
     <topBar title="订单详情"></topBar>
-    <div class="start-cd" v-if="data.status == 1 && cdStart">
+    <div class="start-cd" v-if="data.status == 1 && cdStart != 0">
       距离开场还有
       <span>{{cdStart}}</span>
     </div>
@@ -43,7 +43,10 @@
     <div class="bd-box" v-if="data.status == 1 ">
       <div class="order-info-cloumn">取电影票</div>
       <ul class="qr-info">
-        <li><img :src="data.QR" width="120" height="120"></li>
+        <li>
+          <img :src="data.QR" width="120" height="120" :class="{lose:isEnd}">
+          <span class="over iconfont" v-if="isEnd">&#xe6a1;</span>
+        </li>
         <li class="much">{{data.seat_id && data.seat_id.length}}张电影票</li>
         <li class="get-code">取票码：123456 564321</li>
       </ul>
@@ -108,7 +111,8 @@ export default {
       order_id: null,
       cdTime: 0, //支付倒计时
       timer: null, //定时器
-      cdStart: 0 //开场倒计时
+      cdStart: 0, //开场倒计时
+      isEnd:null  //是否完场
     };
   },
   methods: {
@@ -117,6 +121,7 @@ export default {
       orderDetail({ order_id: this.order_id }).then(res => {
         let { msg, code, data } = res;
         if (code == 0) {
+          data.server_datetime / 1000 > dateTime2Stamp(data.end_datetime) ? this.isEnd = true : this.isEnd = false; //是否完场
           this.data = data;
           if (data.status === 0) this.payCd();
           if (data.status === 1) this.startCd();
@@ -132,9 +137,11 @@ export default {
     },
     //开场倒计时
     startCd() {
-      let serverTime = parseInt(this.data.serverDate / 1000); //服务器时间
-      let startTime = dateTime2Stamp(this.data.start_datetime) / 1000;
+      let serverTime = parseInt(this.data.server_datetime / 1000); //服务器时间
+      let startTime = dateTime2Stamp(this.data.start_datetime);
       let cds = startTime - serverTime;
+      
+      if(cds < 0) return;
 
       let cd = (cds) => {
         let day =
@@ -153,6 +160,7 @@ export default {
       let timer = setInterval(() => {
         cds--;
         cd(cds);
+
         if(cds<=0){
           clearInterval(timer);
         }
@@ -161,8 +169,8 @@ export default {
     //支付倒计时 sec/秒
     payCd(sec = 600) {
       let placeOrderTime =
-        dateTime2Stamp(this.data.order_datetime) / 1000 + sec; //下单时间
-      let serverTime = parseInt(this.data.serverDate / 1000); //服务器时间
+        dateTime2Stamp(this.data.order_datetime) + sec; //下单时间
+      let serverTime = parseInt(this.data.server_datetime / 1000); //服务器时间
       let cds = placeOrderTime - serverTime;
 
       if (cds <= 0) {
@@ -344,7 +352,12 @@ export default {
       margin-left: 2px;
     }
   }
-  .qr-info{ text-align: center;}
+  .qr-info{ 
+    text-align: center;
+    li{ position: relative;}
+    .over{ font-size: 70px; position: absolute; color: @ddd; top: -40px; right: 55px;}
+  }
   .much,.get-code{ color: @lightColor; margin-top: 5px;}
+  .lose{ opacity: 0.5;}
 }
 </style>

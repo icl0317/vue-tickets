@@ -39,6 +39,11 @@ export function cancelOrder (params = {}){
 export function payOrder (params = {}){
     return Post("/api/payOrder", {...params,needLogin:true});
 }
+//获取订单列表
+export function getOrderList (params = {}){
+    return Get("/api/getOrderList", {...params,needLogin:true});
+}
+
 //新闻
 export function getFindNew (params = {}){
     return Get("/api/getFindNew", params);

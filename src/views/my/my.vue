@@ -3,7 +3,7 @@
     <div class="user-info">
       <dl class="user">
         <dt><img src="../../images/default_photo.png" width="46" height="46"></dt>
-        <dd>cc</dd>
+        <dd>{{username}}</dd>
       </dl>
       <div class="my-list">
         <ul>
@@ -25,7 +25,9 @@ export default {
     fixedFoot
   },
   data() {
-    return {};
+    return {
+      username:this.$store.state.piaoUserName
+    };
   },
   methods: {
     goTickets(){
@@ -60,8 +62,8 @@ export default {
       .borderRadius(5px);
     }
     li {
-      height: 40px;
-      line-height: 40px;
+      height: 46px;
+      line-height: 46px;
       border-bottom: 1px solid @ddd;
       font-size: @normalSize;
     }

@@ -99,7 +99,7 @@ export const rmSame = (arr,key) =>{
   */
 export const dateTime2Stamp = dateTime => {
   dateTime.replace(/-/,'/');
-  return new Date(dateTime).getTime()
+  return new Date(dateTime).getTime() / 1000;
 };
  /**
  * 小于10前位补0
