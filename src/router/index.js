@@ -82,7 +82,8 @@ const router = new Router({
       name: "order-detail",
       component: orderDetail,
       meta: {
-        deepPath: 2
+        deepPath: 2,
+        needLogin:true
       }
     },
     {
@@ -100,7 +101,8 @@ const router = new Router({
       name: "tickets",
       component: tickets,
       meta: {
-        deepPath: 1
+        deepPath: 1,
+        needLogin:true
       }
     },
     {
@@ -127,6 +129,7 @@ const router = new Router({
 router.beforeEach((to, from, next) => {
   //需要登录权限页面 并 没有token
   if(to.meta.needLogin && !store.state.piaoToken){
+
     if (to.path === '/login') { // 如果是登录页面的话，直接next()
       next();
     } else { // 否则 跳转到登录页面
