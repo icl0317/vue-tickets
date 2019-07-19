@@ -1,7 +1,5 @@
 <template>
   <div id="film">
-   
-      <!-- <div class="film-bg"></div> -->
       <div class="film-content">
         <div class="header" @click="goCityList">
           <dl class="cinema-info">
@@ -26,7 +24,7 @@
             </div>
           </div>
 
-          <div class="film-intro">
+          <div class="film-intro" v-if="filmData[filmiNow]">
             <h3>{{filmData[filmiNow].film_name}}</h3>
             <p>{{filmData[filmiNow].film_long}}分钟 | {{filmData[filmiNow].film_type}} | {{filmData[filmiNow].actors}}</p>
           </div>
@@ -38,16 +36,16 @@
             </div>
 
             <div class="play-detail" v-show="playiNow == 0">
-              <ul>
+              <ul v-if="filmData[filmiNow]">
                 <li v-for="(item , index) in filmData[filmiNow].children" :key="index">
-                  <dl class="play-date">
-                    <dt>{{_stampToTime(item.start_datetime , "D")}}</dt>
-                    <dd>{{_stampToTime(item.start_datetime , "M")}}月</dd>
+                  <dl class="play-date" v-if="item._start_datetime">
+                    <dt>{{item._start_datetime.D}}</dt>
+                    <dd>{{item._start_datetime.M}}月</dd>
                   </dl>
                   <div class="item-detail">
-                    <div class="time-block">
-                      <div class="start-time">{{_stampToTime(item.start_datetime , "hm")}}</div>
-                      <div class="end-time">{{_stampToTime(item.end_datetime , "hm")}}散场</div>
+                    <div class="time-block" v-if="item._end_datetime">
+                      <div class="start-time">{{item._start_datetime.h}}:{{item._start_datetime.m}}</div>
+                      <div class="end-time">{{item._end_datetime.h}}:{{item._end_datetime.m}}散场</div>
                     </div>
                     <div class="screen-block" style="width:80px;">
                       <div class="screen-name">{{item.screen_name}}</div>
@@ -67,7 +65,7 @@
                 </li>
               </ul>
             </div>
-            <div class="film-detail" v-show="playiNow == 1">{{filmData[filmiNow].brief}}</div>
+            <div class="film-detail" v-show="playiNow == 1" v-if="filmData[filmiNow]">{{filmData[filmiNow].brief}}</div>
           </div>
         </div>
 
@@ -106,28 +104,7 @@ export default {
       hasPosCinema: "", //是否定位到影院或是否有排期
       filmiNow: 0,
       playiNow: 0,
-      filmData: [
-        {
-          film_name: "",
-          film_photo: "",
-          film_long: "",
-          film_type: "",
-          actors: "",
-          brief: "",
-          film_id: "",
-          children: [
-            {
-              start_datetime: "",
-              end_datetime: "",
-              screen_name: "",
-              language: "",
-              film_version: "",
-              sell_price: 5,
-              session_id: ""
-            }
-          ]
-        }
-      ],
+      filmData: [],
       cinemaInfo: {
         cinema_name: "",
         address: "",
@@ -176,12 +153,6 @@ export default {
           });
           return;
         }
-        // this.collegeInfo = {
-        //     college_name: data.college_name,
-        //     address: data.address,
-        //     cinema_name: data.cinema_name,
-        //     college_id: college_id
-        //   };
 
         this.loading = false;
 
@@ -266,7 +237,9 @@ export default {
             film_version: v.film_version,
             sell_price: v.sell_price,
             session_id: v._id,
-            screen_id: v.screen_id
+            screen_id: v.screen_id,
+            _start_datetime:timeFormat(v.start_datetime),
+            _end_datetime:timeFormat(v.end_datetime)
           }
         ];
 
@@ -280,10 +253,6 @@ export default {
       });
       return arr;
     },
-    //时间戳转时间
-    _stampToTime(stamp, format) {
-      return timeFormat(stamp, format);
-    },
     //定位
     getPos() {
       let _this = this;
@@ -293,12 +262,12 @@ export default {
       );
       geolocation.getLocation(
         function(res) {
+          console.log(res);
           let { lat, lng } = res;
-
           getLocationCollege({ lat, lng }).then(res => {
             let { code, data, msg } = res;
             if (code == 0) {
-              localStorage.cinema_id = _this.cinemaInfo.cinema_id = data._id;
+              _this.$store.state.currentCinemaId = sessionStorage.cinema_id = _this.cinemaInfo.cinema_id = data._id;
               _this.getFilmData();
             } else {
               //定位失败或没有定位学校
@@ -312,8 +281,8 @@ export default {
         function(err) {
           //用户拒绝定位
           _this.$router.push({
-            name: "college-list",
-            params: {
+            name: "city-list",
+            query: {
               err: "定位失败"
             }
           });
@@ -322,10 +291,19 @@ export default {
     }
   },
   created() {
-    this.cinemaInfo.cinema_id =
-      this.$route.query.cinema_id || localStorage.cinema_id;
+    if(this.$route.query.cinema_id){
+      sessionStorage.cinema_id = this.cinemaInfo.cinema_id = this.$route.query.cinema_id;
+    }else{
+      this.cinemaInfo.cinema_id = sessionStorage.cinema_id;
+    } 
   },
   mounted() {
+    let getCinemaId = this.$route.query.cinema_id;
+    if(getCinemaId){
+      this.$store.state.currentCinemaId = sessionStorage.cinema_id = this.cinemaInfo.cinema_id = getCinemaId;
+    }else{
+      this.cinemaInfo.cinema_id = this.$store.state.currentCinemaId;
+    }
     if (!this.cinemaInfo.cinema_id) {
       this.getPos();
     } else {
@@ -339,21 +317,6 @@ export default {
 
 #film {
   padding-bottom: 40px;
-  // .film-bg {
-  //   background: url(../../assets/2.jpg) no-repeat;
-  //   background-size: cover;
-  //   height: 100%;
-  //   background-attachment: fixed;
-  //   background-size: cover;
-  //   filter: blur(60px);
-  //   -webkit-filter: blur(60rpx);
-  //   -webkit-transform: translate3d(0, 0, 0);
-  //   -moz-transform: translate3d(0, 0, 0);
-  //   -ms-transform: translate3d(0, 0, 0);
-  //   transform: translate3d(0, 0, 0);
-  //   .fullPos();
-  // }
-
   .film-content {
     background: @fff;
     z-index: 9;
@@ -584,6 +547,7 @@ export default {
       }
       p {
         color: @lightColor;
+        padding: 0 10px;
         .textCut();
       }
     }

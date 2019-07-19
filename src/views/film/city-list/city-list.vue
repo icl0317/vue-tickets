@@ -1,16 +1,16 @@
 <template>
-  <div id="college-list">
+  <div id="city-list">
     <topBar></topBar>
     <div class="search-city">
       <mt-search v-model="sValue" cancel-text="取消" placeholder="输入城市名"></mt-search>
     </div>
-    <dl class="location" v-show="locationCollege">
+    <!-- <dl class="location" v-show="locationCollege">
       <dt>定位城市大学</dt>
       <dd>
         <span class="city-name" v-if="!locationCollegeId">{{locationCollege}}</span>
         <span class="city-name" v-if="locationCollegeId" @click="toLocationCinema(locationCollegeId)">{{locationCollege}}</span>
       </dd>
-    </dl>
+    </dl> -->
     <!-- <dl class="hot-city">
       <dt>热门城市</dt>
       <dd>
@@ -38,6 +38,7 @@ import topBar from "@/components/topBar/topbar";
 import loading from "@/components/loading/loading";
 import { getCityList } from "@/api/api";
 import { findInArr, rmSame } from "@/utils/util";
+import { Toast } from 'mint-ui';
 export default {
   name: "",
   components: {
@@ -102,8 +103,6 @@ export default {
   },
   mounted() {
     let { college_name, college_id, err } = this.$route.params;
-    this.locationCollege = college_name || err;
-    this.locationCollegeId = college_id;
     this.getCityData();
   }
 };
@@ -111,7 +110,7 @@ export default {
 
 <style lang="less" scoped>
 @import "../../../style/mixin";
-#college-list {
+#city-list {
   background: #fff;
   .search-city {
     height: 44px;

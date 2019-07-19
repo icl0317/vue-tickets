@@ -29,10 +29,10 @@ export const mDrag = (downObj, dragObg) => {
  */
 export const rmSameObj = (arr, key, obj) => {
   let _obj = obj[key] ? obj[key] : obj;
-  let _del = ""
+  let _del = "";
   arr.forEach((v, i) => {
     if (v[key] == _obj) {
-        _del = arr.splice(i, 1);
+      _del = arr.splice(i, 1);
     }
   });
   return _del;
@@ -43,65 +43,52 @@ export const rmSameObj = (arr, key, obj) => {
  * @param {Array} arr 包含对象数组
  * @param {String} key 要对比的键值
  */
-export const rmSame = (arr,key) =>{
+export const rmSame = (arr, key) => {
   let obj = {};
   return arr.reduce((v, next) => {
     obj[next[key]] ? "" : (obj[next[key]] = true && v.push(next));
     return v;
   }, []);
-}
+};
 
 /**
  * 时间戳或时间格式导出
  * @param {string,string}
- * timeStamp 时间戳
- * format = YMD => 年-月-日 , Y=> 年 , M=>月 , D=>日 , YM => 年-月 , hms=> 时:分:秒 , YMDhms=> 年-月-日 时:分:秒 , YMDhm=> 年-月-日 时:分
+ * date 时间戳10 | 日期时间 | GMT
+ * 
  */
- export const timeFormat = (timeStamp, format= "YMDhms") => {
-   let getDateTime = null;
+export const timeFormat = (date, format = "default") => {
+  if(!date)return;
+  let getDate = isNaN(date) ? date.replace(/-/g, "/") : date * 1000;
+  let oDate = new Date(getDate);
+  let Y = oDate.getFullYear();
+  let M = toDouble(oDate.getMonth() + 1);
+  let D = toDouble(oDate.getDate());
+  let h = toDouble(oDate.getHours());
+  let m = toDouble(oDate.getMinutes());
+  let s = toDouble(oDate.getSeconds());
+ 
+  let oMap = new Map([
+    ["YMD", `${Y}-${M}-${D}`],
+    ["hms", `${h}:${m}:${s}`],
+    ["YMDhms", `${Y}-${M}-${D} ${h}:${m}:${s}`],
+    ["Y$M$D$", `${Y}年${M}月${D}日`],
+    ["h$m$s$", `${h}时${m}分${s}秒`],
+    ["Y$M$D$h$m$s$", `${Y}年${M}月${D}日 ${h}时${m}分${s}秒`],
+    ["default", {Y,M,D,h,m,s}]
+  ]);
+  return oMap.get(format);
+};
 
-    if(isNaN(timeStamp*1) && timeStamp != undefined){
-      getDateTime = timeStamp.replace(/-/g,'/');
-    }else{
-      getDateTime = timeStamp/10000000000 < 1 ? timeStamp* 1000 : timeStamp;
-    }
-   
-    let oDate = new Date(getDateTime);
-    let Y = oDate.getFullYear();
-    let M = toDouble(oDate.getMonth() + 1);
-    let D = toDouble(oDate.getDate());
-    let h = toDouble(oDate.getHours());
-    let m = toDouble(oDate.getMinutes());
-    let s = toDouble(oDate.getSeconds());
-    let oMap = new Map([
-      ["Y", Y],
-      ["M", M],
-      ["D", D],
-      ["h", h],
-      ["m", m],
-      ["hm", `${h}:${m}`],
-      ["hms", `${h}:${m}:${s}`],
-      ["YM", `${Y}-${M}`],
-      ["YMD", `${Y}-${M}-${D}`],
-      ["YMDhms", `${Y}-${M}-${D} ${h}:${m}:${s}`],
-      ["YMDhm", `${Y}-${M}-${D} ${h}:${m}`],
-      ["Y$M$D$",`${Y}年${M}月${D}日`],
-      ["Y$M$",`${Y}年${M}月`],
-      ["M$D$",`${M}月${D}日`],
-      ["m$s$",`${m}分${s}秒`]
-    ]);
-    return oMap.get(format);
- }
-
- /**
-  * 时间转时间戳
-  * @param { Date } 日期时间 
-  */
+/**
+ * 时间转时间戳
+ * @param { Date } 日期时间
+ */
 export const dateTime2Stamp = dateTime => {
-  dateTime.replace(/-/,'/');
+  dateTime.replace(/-/, "/");
   return new Date(dateTime).getTime() / 1000;
 };
- /**
+/**
  * 小于10前位补0
  * @param {number}
  */
@@ -112,12 +99,12 @@ export const toDouble = num => (num < 10 ? "0" + num : num);
  * @param {array, object, string}
  *
  */
-export const findInArr = (arr,newObj,key) => {
-  let i=0;
-  for(i; i<arr.length; i++){
-    if(arr[i][key] == newObj[key]){
+export const findInArr = (arr, newObj, key) => {
+  let i = 0;
+  for (i; i < arr.length; i++) {
+    if (arr[i][key] == newObj[key]) {
       return i;
     }
   }
   return -1;
-}
+};

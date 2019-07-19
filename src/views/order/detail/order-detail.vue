@@ -12,7 +12,7 @@
           <span>{{data.total_price + data.serve_price}}</span>元
         </dt>
         <dd>
-         请在<em>{{timeFormat(cdTime,'m$s$')}}</em>内完成支付
+         请在<em id="paycd">{{cdTime.m}}分{{cdTime.s}}分</em>内完成支付
         </dd>
         <dd>
           <button class="cancel-pay-btn" type="button" @click="cancelOrder">取消订单</button>
@@ -31,7 +31,8 @@
           </h3>
           <p
             class="film-time"
-          >{{timeFormat(data.start_datetime, 'M$D$')}} {{timeFormat(data.start_datetime, 'hm')}}~{{timeFormat(data.end_datetime, 'hm')}} {{data.language}}</p>
+            v-if="data._start_datetime"
+          >{{data._start_datetime.M}}月{{data._start_datetime.D}}日 {{data._start_datetime.h}}:{{data._start_datetime.m}} ~ {{data._end_datetime.h}}:{{data._end_datetime.m}} {{data.language}}</p>
           <p class="film-address">{{data.cinema_name}} {{data.screen_name}}</p>
           <ul class="seat-info clearfix">
             <li v-for="(item,index) in data.seat" :key="index">{{item}}</li>
@@ -47,7 +48,7 @@
           <img :src="data.QR" width="120" height="120" :class="{lose:isEnd}">
           <span class="over iconfont" v-if="isEnd">&#xe6a1;</span>
         </li>
-        <li class="much">{{data.seat_id && data.seat_id.length}}张电影票</li>
+        <li class="much">{{data.seat && data.seat.length}}张电影票</li>
         <li class="get-code">取票码：123456 564321</li>
       </ul>
     </div>
@@ -72,7 +73,7 @@
           {{data.pay_price}}元
           <em
             class="serve_price"
-          >（含服务费：{{data.serve_price}}元 * {{data.seat_id && data.seat_id.length}}）</em>
+          >（含服务费：{{data.serve_price}}元 * {{data.seat && data.seat.length}}）</em>
         </li>
       </ul>
     </div>
@@ -109,7 +110,7 @@ export default {
       loading: true,
       data: {},
       order_id: null,
-      cdTime: 0, //支付倒计时
+      cdTime: null, //支付倒计时
       timer: null, //定时器
       cdStart: 0, //开场倒计时
       isEnd:null  //是否完场
@@ -122,18 +123,20 @@ export default {
         let { msg, code, data } = res;
         if (code == 0) {
           data.server_datetime / 1000 > dateTime2Stamp(data.end_datetime) ? this.isEnd = true : this.isEnd = false; //是否完场
+          data._start_datetime = timeFormat(data.start_datetime);
+          data._end_datetime = timeFormat(data.end_datetime);
+
           this.data = data;
+          
           if (data.status === 0) this.payCd();
+          
           if (data.status === 1) this.startCd();
+          
         } else {
           Toast(msg);
         }
         this.loading = false;
       });
-    },
-    //时间格式转换
-    timeFormat(val, format) {
-      return timeFormat(val, format);
     },
     //开场倒计时
     startCd() {
@@ -167,18 +170,19 @@ export default {
       }, 1000);
     },
     //支付倒计时 sec/秒
-    payCd(sec = 600) {
+    payCd(sec = 300) {
       let placeOrderTime =
         dateTime2Stamp(this.data.order_datetime) + sec; //下单时间
       let serverTime = parseInt(this.data.server_datetime / 1000); //服务器时间
       let cds = placeOrderTime - serverTime;
-
+      let oPayCd = this.$refs.paycd;
+  
       if (cds <= 0) {
         cds = 0;
       } else {
         this.timer = setInterval(() => {
           cds--;
-          this.cdTime = cds;
+          this.cdTime = timeFormat (cds);
           if (cds <= 0) {
             clearInterval(this.timer);
             MessageBox.alert("订单已过期").then(action => {
@@ -190,7 +194,7 @@ export default {
         }, 1000);
       }
 
-      this.cdTime = cds;
+      this.cdTime = timeFormat(cds);
     },
     //取消订单
     cancelOrder() {

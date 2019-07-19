@@ -9,7 +9,7 @@
         </div>
         <div
           class="film-info"
-        >{{formatDate.month}}月{{formatDate.day}}号&nbsp;&nbsp;{{formatDate.h}}:{{formatDate.m}}&nbsp;&nbsp;{{filmInfo.language}}</div>
+        >{{formatDate.M}}月{{formatDate.D}}号&nbsp;&nbsp;{{formatDate.h}}:{{formatDate.m}}&nbsp;&nbsp;{{filmInfo.language}}</div>
       </div>
     </div>
 
@@ -43,7 +43,7 @@
 <script>
 import topBar from "@/components/topBar/topbar";
 import langType from "@/components/langType/lang-type";
-import { mDrag, rmSameObj } from "@/utils/util";
+import { mDrag, rmSameObj, timeFormat } from "@/utils/util";
 import { Toast, Indicator } from "mint-ui";
 import { getSeat, placeOrder } from "@/api/api";
 import loading from "@/components/loading/loading";
@@ -78,12 +78,11 @@ export default {
       getSeat({ screen_id: this.screen_id, _id: this.session_id }).then(res => {
         let { code, msg, data } = res;
         if (code == 0) {
-          let reDate = /(?<year>\d{4})-(?<month>\d{2})-(?<day>\d{2})\s(?<h>\d{2}):(?<m>\d{2})/;
-          let matchObj = reDate.exec(data.film_info.start_datetime);
           this.drawSeat(data.seat);
           this.list = data.seat;
           this.filmInfo = data.film_info;
-          this.formatDate = matchObj.groups;
+          this.formatDate = timeFormat(data.film_info.start_datetime);
+
         } else {
           Toast(msg);
         }
@@ -131,6 +130,7 @@ export default {
           }
           if (v.seat_status == 4) {
             ctx.drawImage(img4, wr * v.graph_col, hb * v.graph_row, _w, _h);
+            _this.selectedArr.push(v)
           }
           maxColArr.push(v.graph_col);
           maxRowArr.push(v.graph_row);

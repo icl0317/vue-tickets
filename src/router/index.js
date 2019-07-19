@@ -22,6 +22,10 @@ const router = new Router({
   //mode: "history",
   routes: [
     {
+      path: "/",
+      redirect:"/index"
+    },
+    {
       path: "/index",
       name: "film-list",
       title: "电影",
@@ -32,7 +36,7 @@ const router = new Router({
     },
     {
       path: "/city-list",
-      title: "学校列表",
+      title: "城市列表",
       name: "city-list",
       component: cityList,
       meta: {
