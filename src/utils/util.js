@@ -85,7 +85,7 @@ export const timeFormat = (date, format = "default") => {
  * @param { Date } 日期时间
  */
 export const dateTime2Stamp = dateTime => {
-  dateTime.replace(/-/, "/");
+  dateTime = dateTime.replace(/-/g, "/");
   return new Date(dateTime).getTime() / 1000;
 };
 /**

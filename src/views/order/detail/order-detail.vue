@@ -21,6 +21,7 @@
     </div>
 
     <div class="bd-box">
+  
       <div class="config-film-info clearfix">
         <img :src="data.film_photo" width="94" height="134" class="film-photo" />
 
@@ -89,7 +90,7 @@
     <div class="pbox" v-if="data.status == 0">
       <div class="paybtn" @click="payOrder">确认付款</div>
     </div>
-    <loading :isShow="loading"></loading>
+    <!-- <loading :isShow="loading"></loading> -->
   </div>
 </template>
 <script>
@@ -107,14 +108,16 @@ export default {
   },
   data() {
     return {
-      loading: true,
-      data: {},
+      loading: false,
+      data: {
+      },
       order_id: null,
       cdTime: null, //支付倒计时
       timer: null, //定时器
+      startTimer:null,
       cdStart: 0, //开场倒计时
       isEnd:null  //是否完场
-    };
+    }
   },
   methods: {
     getOrderInfo() {
@@ -125,18 +128,18 @@ export default {
           data.server_datetime / 1000 > dateTime2Stamp(data.end_datetime) ? this.isEnd = true : this.isEnd = false; //是否完场
           data._start_datetime = timeFormat(data.start_datetime);
           data._end_datetime = timeFormat(data.end_datetime);
-
           this.data = data;
-          
           if (data.status === 0) this.payCd();
           
           if (data.status === 1) this.startCd();
-          
         } else {
           Toast(msg);
         }
+
         this.loading = false;
+  
       });
+    
     },
     //开场倒计时
     startCd() {
@@ -159,31 +162,30 @@ export default {
         this.cdStart = `${day}${hours}${minutes}`;
       };
       cd(cds);
-
-      let timer = setInterval(() => {
+      this.startTimer = setInterval(() => {
         cds--;
         cd(cds);
-
         if(cds<=0){
-          clearInterval(timer);
+          clearInterval(startTimer);
         }
-      }, 1000);
+      }, 10000);
     },
     //支付倒计时 sec/秒
     payCd(sec = 300) {
+      
       let placeOrderTime =
         dateTime2Stamp(this.data.order_datetime) + sec; //下单时间
       let serverTime = parseInt(this.data.server_datetime / 1000); //服务器时间
       let cds = placeOrderTime - serverTime;
       let oPayCd = this.$refs.paycd;
-  
+      
       if (cds <= 0) {
         cds = 0;
       } else {
         this.timer = setInterval(() => {
           cds--;
           this.cdTime = timeFormat (cds);
-          if (cds <= 0) {
+          if (cds <= 0) {            
             clearInterval(this.timer);
             MessageBox.alert("订单已过期").then(action => {
               this.$router.replace({
@@ -231,11 +233,17 @@ export default {
       });
     }
   },
+  beforeDestroy() {    //页面关闭时清除定时器  
+    clearInterval(this.timer);
+    clearInterval(this.startTimer);
+    
+  },
   created() {
     this.order_id = this.$route.query.order_id;
+     this.getOrderInfo();
   },
   mounted() {
-    this.getOrderInfo();
+   
   }
 };
 </script>

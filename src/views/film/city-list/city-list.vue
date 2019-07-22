@@ -26,6 +26,7 @@
       <dd>
         <div class="citys" v-for="(v,idx) in item.children" :key="idx">
           <router-link :to="'/cinema-list?city='+v.city">{{v.city}}</router-link>
+          
         </div>
       </dd>
     </dl>
@@ -122,7 +123,7 @@ export default {
     dt {
       height: 34px;
       line-height: 36px;
-      background: #f3f3f3;
+      background: #fafafa;
       padding: 0 10px;
       
     }

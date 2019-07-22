@@ -20,7 +20,7 @@ export default {
   text-align: center;
   background: #e6f6ff;
   font-size: @smallSize;
-  padding: 0 2px;
+  padding: 2px 2px 0;
   vertical-align: middle;
   .borderRadius(2px);
 }

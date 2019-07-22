@@ -1,5 +1,5 @@
 <template>
-  <div id="app">
+  <div id="app" v-cloak >
     <transition :name="slideMode">
       <!-- <keep-alive></keep-alive>  @touchmove.prevent-->
         <router-view/>
@@ -36,6 +36,7 @@ export default {
 <style lang="less">
 @import "./style/common";
 @import "./style/font-icons/iconfont.css";
+[v-cloak]{ display:none}
 .slide-in-enter-active,
 .slide-in-leave-active,
 .slide-out-enter-active,

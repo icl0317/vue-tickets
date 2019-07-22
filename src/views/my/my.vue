@@ -8,7 +8,8 @@
       <div class="my-list">
         <ul>
           <li @click="goTickets">
-            <span class="go-in iconfont">&#xe61f;</span><span class="my-icon iconfont">&#xe694;</span>电影票
+            <div><span class="my-icon iconfont">&#xe694;</span>电影票</div>
+            <div><mt-badge size="small" color="#ff9900">1</mt-badge><span class="go-in iconfont">&#xe61f;</span></div>
           </li>
           <li></li>
         </ul>
@@ -17,8 +18,11 @@
     <fixedFoot></fixedFoot>
   </div>
 </template>
+
 <script>
+
 import fixedFoot from "@/components/fixedFooter/foot";
+import io from 'socket.io-client';
 export default {
   name: "",
   components: {
@@ -35,6 +39,13 @@ export default {
         name:'tickets'
       });
     }
+  },
+  mounted(){
+    // var socket = io.connect('http://127.0.0.1:8084');
+    // socket.on('news', function (data) {
+    //   console.log(data);
+    //   socket.emit('my other event', { my: 'data' });
+    // });
   }
 };
 </script>
@@ -63,7 +74,9 @@ export default {
     }
     li {
       height: 46px;
-      line-height: 46px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
       border-bottom: 1px solid @ddd;
       font-size: @normalSize;
     }
