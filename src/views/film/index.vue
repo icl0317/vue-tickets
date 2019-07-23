@@ -8,7 +8,7 @@
           </dl>
           <span class="go-info iconfont">&#xe61f;</span>
         </div>
-        <div v-if="!hasPosCinema">
+        <div v-if="filmData">
           <div class="swipe-wrap">
             <div class="swipe-slide" ref="swipeSlide">
               <ul class="imgs clearfix" ref="imgs" style="-webkit-transform:translate3d(150px,0,0)">
@@ -68,15 +68,8 @@
             <div class="film-detail" v-show="playiNow == 1" v-if="filmData[filmiNow]">{{filmData[filmiNow].brief}}</div>
           </div>
         </div>
-
-        <div v-if="hasPosCinema" class="has-pos-cinema">
-          <dl class="no-cinema">
-            <dt>
-              <span class="fail iconfont">&#xe620;</span>
-            </dt>
-            <dd>{{hasPosCinema}}</dd>
-          </dl>
-        </div>
+        {{bb}}
+        <noData :isShow="!filmData" title="还没有排期，换其他影院看看吧~"></noData>
       </div>
     
     <fixedFoot></fixedFoot>
@@ -87,6 +80,7 @@
 <script>
 import fixedFoot from "@/components/fixedFooter/foot";
 import loading from "@/components/loading/loading";
+import noData from "@/components/noData/nodata";
 import { timeFormat, findInArr } from "@/utils/util";
 import { getIndexFilmList, getLocationCollege, getCinemaList } from "@/api/api";
 import "@/utils/geolocation.min";
@@ -95,28 +89,32 @@ export default {
   name: "film-list",
   components: {
     fixedFoot,
-    loading
+    loading,
+    noData
   },
   data() {
     return {
       allLoaded:false,
       loading: "",
-      hasPosCinema: "", //是否定位到影院或是否有排期
       filmiNow: 0,
       playiNow: 0,
-      filmData: [],
+      filmData: null,
       cinemaInfo: {
         cinema_name: "",
         address: "",
-        cinema_id: null //影院id
-      }
+        cinema_id: null, //影院id
+        city:null
+      },
+      cc:0,
+      bb:''
     };
   },
   methods: {
     //去城市列表
     goCityList() {
       this.$router.push({
-        name: "city-list"
+        name: "cinema-list",
+        query:{city:this.cinemaInfo.city }
       });
     },
     //去座位图
@@ -144,9 +142,8 @@ export default {
           this.cinemaInfo.cinema_name = data.info.cinema_name;
           this.cinemaInfo.address = data.info.address;
         } else if (code == 1) {
-          this.hasPosCinema = "暂无排期";
           this.cinemaInfo.cinema_name = "请选择城其他影院";
-          this.cinemaInfo.address = "暂无数据";
+          this.cinemaInfo.address = "暂无影片";
         } else if (code == 2) {
           this.$router.push({
             name: "city-list"
@@ -156,6 +153,7 @@ export default {
 
         this.loading = false;
 
+        setTimeout(()=>{
         //轮播图
         let oImg = this.$refs.imgs;
         let oScroll = this.$refs.swipeSlide;
@@ -213,7 +211,9 @@ export default {
           },
           false
         );
+        },1000)
       });
+      
     },
     //后台数据格式转换
     formatFilmData(list) {
@@ -262,7 +262,6 @@ export default {
       );
       geolocation.getLocation(
         function(res) {
-          console.log(res);
           let { lat, lng } = res;
           getLocationCollege({ lat, lng }).then(res => {
             let { code, data, msg } = res;
@@ -274,20 +273,31 @@ export default {
               _this.hasPosCinema = "没有获取到附近影院";
               _this.cinemaInfo.cinema_name = "请选择城市";
               _this.cinemaInfo.address = "定位失败";
+              // _this.$router.push({
+              //   name: "city-list",
+              //   query: {
+              //     err: "定位失败"
+              //   }
+              // });
             }
             _this.loading = false;
           });
         },
         function(err) {
           //用户拒绝定位
-          _this.$router.push({
-            name: "city-list",
-            query: {
-              err: "定位失败"
-            }
-          });
+          // _this.$router.push({
+          //   name: "city-list",
+          //   query: {
+          //     err: "定位失败"
+          //   }
+          // });
         }
       );
+
+      //实时监听位置变化
+      geolocation.watchPosition(function(res){
+        
+      })
     }
   },
   created() {
@@ -295,7 +305,8 @@ export default {
       sessionStorage.cinema_id = this.cinemaInfo.cinema_id = this.$route.query.cinema_id;
     }else{
       this.cinemaInfo.cinema_id = sessionStorage.cinema_id;
-    } 
+    }
+    this.cinemaInfo.city = this.$route.query.city;
   },
   mounted() {
     let getCinemaId = this.$route.query.cinema_id;
@@ -309,6 +320,7 @@ export default {
     } else {
       this.getFilmData();
     }
+    this.getPos();
   }
 };
 </script>
@@ -567,13 +579,6 @@ export default {
     bottom: 46px;
     background: #f4f4f4;
   }
-  .no-cinema {
-    text-align: center;
-    padding-top: 40px;
-    .fail {
-      color: #ccc;
-      font-size: 60px;
-    }
-  }
+  
 }
 </style>

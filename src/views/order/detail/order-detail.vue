@@ -216,7 +216,7 @@ export default {
     },
     //支付
     payOrder() {
-      Indicator.open();
+      Indicator.open('正在支付...');
       payOrder({ order_id: this.order_id }).then(res => {
         let { msg, code, data } = res;
         if (code === 0) {

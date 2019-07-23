@@ -46,6 +46,7 @@ export default {
   position: absolute;
   width:100%;
   left:0;
+  height: 100%;
 }
 
 .slide-in-enter {

@@ -105,6 +105,7 @@ export default {
   mounted() {
     let { college_name, college_id, err } = this.$route.params;
     this.getCityData();
+    
   }
 };
 </script>

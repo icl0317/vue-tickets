@@ -1,25 +1,29 @@
 <template>
   <div id="news">
-    <div class="news-block" v-for="(item,index) in list" :key="index">
-      <div class="date">{{item.release_date | YMD}}</div>
-      <div class="new-pic" @click="inDetail(item._id)">
-        <img :src="item.img_url" width="100%">
+    <div v-if="list">
+      <div class="news-block" v-for="(item,index) in list" :key="index">
+        <div class="date">{{item.release_date | YMD}}</div>
+        <div class="new-pic" @click="inDetail(item._id)">
+          <img :src="item.img_url" width="100%">
+        </div>
+        <h3 class="news-title" @click="inDetail(item._id)">{{item.title}}</h3>
+        <div
+          class="news-intro"
+        >{{item.brief}}</div>
+        <div class="cont">
+          <div class>阅读：{{item.views}}&nbsp;&nbsp;点赞：{{item.like}}</div>
+        </div>
       </div>
-      <h3 class="news-title" @click="inDetail(item._id)">{{item.title}}</h3>
-      <div
-        class="news-intro"
-      >{{item.brief}}</div>
-      <div class="cont">
-        <div class>阅读：{{item.views}}&nbsp;&nbsp;点赞：{{item.like}}</div>
-      </div>
+      <div style="height:46px;"></div>
     </div>
-    <div style="height:46px;"></div>
+    <noData :isShow="!list" title="小编太懒，还没有发布文章~"></noData>
     <fixedFoot></fixedFoot>
     <loading :isShow="loading"></loading>
   </div>
 </template>
 <script>
 import fixedFoot from "@/components/fixedFooter/foot";
+import noData from "@/components/noData/nodata";
 import { getFindNew } from "@/api/api";
 import loading from "@/components/loading/loading";
 import { Toast } from 'mint-ui';
@@ -28,12 +32,13 @@ export default {
   name: "",
   components: {
     fixedFoot,
-    loading
+    loading,
+    noData
   },
   data() {
     return {
       loading: "",
-      list:[]
+      list:null
     };
   },
   methods: {
@@ -43,6 +48,8 @@ export default {
         let {code, msg, data} = res;
         if(code == 0){
           this.list = data;
+        }else if(code == 1){
+          console.warn(msg);
         }else{
           Toast(msg);
         }

@@ -42,6 +42,6 @@ http.interceptors.response.use(
     return Promise.reject(error);
   }
 );
-
+Vue.prototype.$axios = axios;
 export const Post = (url, params) => http.post(url, params);
 export const Get = (url, params) => http.get(url, { params });

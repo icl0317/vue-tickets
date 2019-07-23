@@ -56,6 +56,10 @@ export function getFindDetail (params = {}){
 export function like (params = {}){
     return Post("/api/like", params);
 }
+//获取未支付订单
+export function myInfo (params = {}){
+    return Get("/api/myInfo", params);
+}
 //登录
 export function userLogin (params = {}){
     return Post("/api/userLogin", params);

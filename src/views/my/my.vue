@@ -2,14 +2,21 @@
   <div id="my">
     <div class="user-info">
       <dl class="user">
-        <dt><img src="../../images/default_photo.png" width="46" height="46"></dt>
+        <dt>
+          <img src="../../images/default_photo.png" width="46" height="46" />
+        </dt>
         <dd>{{username}}</dd>
       </dl>
       <div class="my-list">
         <ul>
           <li @click="goTickets">
-            <div><span class="my-icon iconfont">&#xe694;</span>电影票</div>
-            <div><mt-badge size="small" color="#ff9900">1</mt-badge><span class="go-in iconfont">&#xe61f;</span></div>
+            <div>
+              <span class="my-icon iconfont">&#xe694;</span>电影票
+            </div>
+            <div>
+              <mt-badge size="small" color="#ff9900" v-show="data.unpay != 0">{{data.unpay}}</mt-badge>
+              <span class="go-in iconfont">&#xe61f;</span>
+            </div>
           </li>
           <li></li>
         </ul>
@@ -20,9 +27,9 @@
 </template>
 
 <script>
-
 import fixedFoot from "@/components/fixedFooter/foot";
-import io from 'socket.io-client';
+import io from "socket.io-client";
+import { myInfo } from "@/api/api";
 export default {
   name: "",
   components: {
@@ -30,22 +37,32 @@ export default {
   },
   data() {
     return {
-      username:this.$store.state.piaoUserName
+      username: this.$store.state.piaoUserName,
+      data: {}
     };
   },
   methods: {
-    goTickets(){
+    goTickets() {
       this.$router.push({
-        name:'tickets'
+        name: "tickets"
+      });
+    },
+    getUnPayOrder() {
+      // var socket = io.connect('http://127.0.0.1:8084');
+      // socket.on('unpay',  (data) => {
+      //   console.log(data);
+      //   socket.emit('token', {token:this.token});
+      // });
+      myInfo().then(res => {
+        let { code, msg, data } = res;
+        if (code == 0) {
+          this.data = data;
+        }
       });
     }
   },
-  mounted(){
-    // var socket = io.connect('http://127.0.0.1:8084');
-    // socket.on('news', function (data) {
-    //   console.log(data);
-    //   socket.emit('my other event', { my: 'data' });
-    // });
+  mounted() {
+    this.getUnPayOrder();
   }
 };
 </script>
@@ -60,11 +77,18 @@ export default {
     height: 80px;
     .borderRadius(0 0 10px 10px);
   }
-  .user{
-    padding: 10px 15px ;
+  .user {
+    padding: 10px 15px;
     overflow: hidden;
-    dt { float: left; margin-right: 10px;}
-    dd{ font-size: 24px; color: @fff; margin-top: 5px;}
+    dt {
+      float: left;
+      margin-right: 10px;
+    }
+    dd {
+      font-size: 24px;
+      color: @fff;
+      margin-top: 5px;
+    }
   }
   .my-list {
     padding: 0 10px 0;
@@ -89,6 +113,10 @@ export default {
       margin-right: 10px;
     }
   }
-  .my-icon{ margin: 0 5px 0 10px; font-size: 18px; vertical-align: middle;}
+  .my-icon {
+    margin: 0 5px 0 10px;
+    font-size: 18px;
+    vertical-align: middle;
+  }
 }
 </style>

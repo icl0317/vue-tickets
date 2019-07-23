@@ -1,7 +1,10 @@
 <template>
   <div id="cinema-list">
     <topBar :backShow="false" title="选择影院">
-      <span class="go-info iconfont" @click="goCityList">城市列表</span>
+      <span class="go-info iconfont" :class="{active: cityShow}" @click="cityListSet">
+        {{city}}
+        <i class="sj"></i>
+      </span>
     </topBar>
     <ul class="cinema">
       <li
@@ -12,12 +15,22 @@
       >
         <p class="cinema-name">{{item.cinema_name}}</p>
         <p class="address">{{item.address}}</p>
-        <div class="price-up">
-          <span>32元</span>起
+        <div class="price-up" v-if="item.min_price">
+          <span>{{item.min_price}}元</span>起
         </div>
         <div class="dis" v-if="item.dis">{{item.dis}}km</div>
       </li>
     </ul>
+    <div class="city-list-box" v-show="cityShow">
+      <dl class="city-list" v-for="(item,index) in formatCity" :key="index">
+        <dt>{{item.province}}</dt>
+        <dd>
+          <div class="citys" v-for="(v,idx) in item.children" :key="idx">
+            <a href="javascript:;" @click="selectCity(v.city)">{{v.city}}</a>
+          </div>
+        </dd>
+      </dl>
+    </div>
     <loading :isShow="loading"></loading>
   </div>
 </template>
@@ -25,8 +38,9 @@
 <script>
 import topBar from "@/components/topBar/topbar";
 import loading from "@/components/loading/loading";
-import { getCinemaList } from "@/api/api";
+import { getCinemaList, getCityList } from "@/api/api";
 import { Toast } from "mint-ui";
+import { findInArr, rmSame } from "@/utils/util";
 export default {
   name: "",
   components: {
@@ -37,19 +51,27 @@ export default {
     return {
       loading: "",
       cinemaData: [],
-      city: ""
+      city: "",
+      cityList: [],
+      cityShow: false
     };
   },
   methods: {
     //获取影院列表
     getCinemaDate() {
+      this.loading = true;
       getCinemaList({ city: this.city }).then(res => {
         let { code, data, msg } = res;
         if (code == 0) {
-          if(data.userLng){
-            data.data.forEach(v=>{
-              v.dis = this.getDistance(data.userLat,data.userLng,v.lat,v.lng);
-            })
+          if (data.userLng) {
+            data.data.forEach(v => {
+              v.dis = this.getDistance(
+                data.userLat,
+                data.userLng,
+                v.lat,
+                v.lng
+              );
+            });
           }
           this.cinemaData = data.data;
         } else {
@@ -58,24 +80,41 @@ export default {
         this.loading = false;
       });
     },
+    //获取城市列表
+    getCityData() {
+      this.loading = true;
+      getCityList().then(res => {
+        let { code, msg, data } = res;
+        if (code == 0) {
+          this.cityList = rmSame(data, "city");
+        } else {
+          Toast(msg);
+        }
+        this.loading = false;
+      });
+    },
+    selectCity(city) {
+      this.cityShow = false;
+      this.city = city;
+      this.getCinemaDate();
+    },
     //进入首页排期
     toIndexFilm(cinema_id) {
       this.$router.push({
         name: "film-list",
-        query: { cinema_id }
+        query: { cinema_id, city: this.city }
       });
     },
-    //去城市列表
-    goCityList() {
-      this.$router.push({
-        name: "city-list"
-      });
+    //控制城市列表
+    cityListSet() {
+      this.cityShow = !this.cityShow;
+      if(this.cityShow)this.getCityData();
     },
     //计算2点间距离
     getDistance(lat1, lng1, lat2, lng2) {
-      var f = this.getRad((lat1*1 + lat2*1) / 2);
-      var g = this.getRad((lat1*1 - lat2*1) / 2);
-      var l = this.getRad((lng1*1 - lng2*1) / 2);
+      var f = this.getRad((lat1 * 1 + lat2 * 1) / 2);
+      var g = this.getRad((lat1 * 1 - lat2 * 1) / 2);
+      var l = this.getRad((lng1 * 1 - lng2 * 1) / 2);
       var sg = Math.sin(g);
       var sl = Math.sin(l);
       var sf = Math.sin(f);
@@ -102,11 +141,38 @@ export default {
       return (d * PI) / 180.0;
     }
   },
+  computed: {
+    //城市列表数据格式转换
+    formatCity: function() {
+      let arr = [];
+      this.cityList.forEach(v => {
+        let json = {};
+        json.province = v.province.split(",")[0];
+        json.children = [
+          {
+            _id: v._id,
+            city: v.city.split(",")[0]
+          }
+        ];
+        if (findInArr(arr, json, "province") == -1) {
+          arr.push(json);
+        } else {
+          arr[findInArr(arr, json, "province")].children = arr[
+            findInArr(arr, json, "province")
+          ].children.concat(json.children);
+        }
+      });
+      return arr;
+    }
+  },
   mounted() {
     this.city = this.$route.query.city;
     if (this.city) {
       this.getCinemaDate();
+    }else{
+      this.cityShow = true;
     }
+    this.getCityData();
   }
 };
 </script>
@@ -132,7 +198,7 @@ export default {
   }
   .go-info {
     position: absolute;
-    right: 10px;
+    left: 10px;
     top: 0;
     font-size: @smallSize;
   }
@@ -151,6 +217,71 @@ export default {
     position: absolute;
     right: 15px;
     top: 33px;
+  }
+  .city-list-box {
+    position: absolute;
+    left: 0;
+    top: 48px;
+    right: 0;
+    bottom: 0;
+    background: @fff;
+    .search-city {
+      height: 44px;
+    }
+    .location,
+    .hot-city,
+    .city-list {
+      font-size: @normalSize;
+      dt {
+        height: 34px;
+        line-height: 36px;
+        background: #fafafa;
+        padding: 0 10px;
+        font-weight: 700;
+      }
+      dd {
+        padding: 10px;
+      }
+      .city-name {
+        display: inline-block;
+        height: 30px;
+        line-height: 30px;
+        padding: 1px 12px 2px;
+        background: #f3f3f3;
+        margin: 0 5px 0 0;
+      }
+      .citys {
+        a {
+          display: block;
+          padding: 8px 0;
+        }
+      }
+    }
+    .city-list {
+      dd {
+        padding: 4px 10px;
+      }
+    }
+  }
+  .sj {
+    -webkit-backface-visibility: hidden;
+    position: absolute;
+    right: -12px;
+    top: 22px;
+    width: 0;
+    height: 0;
+    border-width: 4px;
+    border-style: solid dashed dashed;
+    border-color: #fff transparent transparent;
+    font-size: 0;
+    line-height: 0;
+  }
+  .go-info.active {
+    .sj {
+      -webkit-transform: rotate(-180deg);
+      transform: rotate(-180deg);
+      top: 18px;
+    }
   }
 }
 </style>
