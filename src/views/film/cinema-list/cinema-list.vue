@@ -2,7 +2,7 @@
   <div id="cinema-list">
     <topBar :backShow="false" title="选择影院">
       <span class="go-info iconfont" :class="{active: cityShow}" @click="cityListSet">
-        {{city}}
+        {{queryCon.city}}
         <i class="sj"></i>
       </span>
     </topBar>
@@ -18,7 +18,7 @@
         <div class="price-up" v-if="item.min_price">
           <span>{{item.min_price}}元</span>起
         </div>
-        <div class="dis" v-if="item.dis">{{item.dis}}km</div>
+        <div class="dis" v-if="item.dis">{{item.dis | unitFormat}}</div>
       </li>
     </ul>
     <div class="city-list-box" v-show="cityShow">
@@ -51,16 +51,16 @@ export default {
     return {
       loading: "",
       cinemaData: [],
-      city: "",
       cityList: [],
-      cityShow: false
+      cityShow: false,
+      queryCon:{} //获取影院条件
     };
   },
   methods: {
     //获取影院列表
     getCinemaDate() {
       this.loading = true;
-      getCinemaList({ city: this.city }).then(res => {
+      getCinemaList(this.queryCon).then(res => {
         let { code, data, msg } = res;
         if (code == 0) {
           if (data.userLng) {
@@ -95,14 +95,15 @@ export default {
     },
     selectCity(city) {
       this.cityShow = false;
-      this.city = city;
+      this.queryCon.city = city;
       this.getCinemaDate();
     },
     //进入首页排期
     toIndexFilm(cinema_id) {
+      alert(cinema_id);
       this.$router.push({
         name: "film-list",
-        query: { cinema_id, city: this.city }
+        query: { cinema_id, city: this.queryCon.city }
       });
     },
     //控制城市列表
@@ -165,9 +166,14 @@ export default {
       return arr;
     }
   },
+  filters:{
+    unitFormat:function(val){
+      return val < 1000 ? `${val}m` : `${(val/1000).toFixed(1)}km`;
+    }
+  },
   mounted() {
-    this.city = this.$route.query.city;
-    if (this.city) {
+    let { lat, lng, city } = this.queryCon = this.$route.query;
+    if (city) {
       this.getCinemaDate();
     }else{
       this.cityShow = true;

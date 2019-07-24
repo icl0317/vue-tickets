@@ -82,7 +82,7 @@ import fixedFoot from "@/components/fixedFooter/foot";
 import loading from "@/components/loading/loading";
 import noData from "@/components/noData/nodata";
 import { timeFormat, findInArr } from "@/utils/util";
-import { getIndexFilmList, getLocationCollege, getCinemaList } from "@/api/api";
+import { getIndexFilmList, getCinemaList } from "@/api/api";
 import "@/utils/geolocation.min";
 
 export default {
@@ -104,9 +104,7 @@ export default {
         address: "",
         cinema_id: null, //影院id
         city:null
-      },
-      cc:0,
-      bb:''
+      }
     };
   },
   methods: {
@@ -252,75 +250,23 @@ export default {
         }
       });
       return arr;
-    },
-    //定位
-    getPos() {
-      let _this = this;
-      let geolocation = new qq.maps.Geolocation(
-        "EZMBZ-A4MEX-MWA4L-T4MZK-66OO5-3OBTD",
-        "film"
-      );
-      geolocation.getLocation(
-        function(res) {
-          let { lat, lng } = res;
-          getLocationCollege({ lat, lng }).then(res => {
-            let { code, data, msg } = res;
-            if (code == 0) {
-              _this.$store.state.currentCinemaId = sessionStorage.cinema_id = _this.cinemaInfo.cinema_id = data._id;
-              _this.getFilmData();
-            } else {
-              //定位失败或没有定位学校
-              _this.hasPosCinema = "没有获取到附近影院";
-              _this.cinemaInfo.cinema_name = "请选择城市";
-              _this.cinemaInfo.address = "定位失败";
-              // _this.$router.push({
-              //   name: "city-list",
-              //   query: {
-              //     err: "定位失败"
-              //   }
-              // });
-            }
-            _this.loading = false;
-          });
-        },
-        function(err) {
-          //用户拒绝定位
-          // _this.$router.push({
-          //   name: "city-list",
-          //   query: {
-          //     err: "定位失败"
-          //   }
-          // });
-        }
-      );
-
-      //实时监听位置变化
-      geolocation.watchPosition(function(res){
-        
-      })
     }
-  },
-  created() {
-    if(this.$route.query.cinema_id){
-      sessionStorage.cinema_id = this.cinemaInfo.cinema_id = this.$route.query.cinema_id;
-    }else{
-      this.cinemaInfo.cinema_id = sessionStorage.cinema_id;
-    }
-    this.cinemaInfo.city = this.$route.query.city;
   },
   mounted() {
-    let getCinemaId = this.$route.query.cinema_id;
-    if(getCinemaId){
-      this.$store.state.currentCinemaId = sessionStorage.cinema_id = this.cinemaInfo.cinema_id = getCinemaId;
-    }else{
-      this.cinemaInfo.cinema_id = this.$store.state.currentCinemaId;
-    }
-    if (!this.cinemaInfo.cinema_id) {
-      this.getPos();
-    } else {
+    let { cinema_id, city } = this.$route.query;
+    if(cinema_id){
+      this.$store.state.currentCinemaId = sessionStorage.cinema_id = this.cinemaInfo.cinema_id = cinema_id;
+      this.cinemaInfo.city = city;
       this.getFilmData();
+    }else{
+
     }
-    this.getPos();
+    // if (!this.cinemaInfo.cinema_id) {
+    //   this.getPos();
+    // } else {
+    //   this.getFilmData();
+    // }
+    //this.getPos();
   }
 };
 </script>
