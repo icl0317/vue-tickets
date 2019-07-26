@@ -26,6 +26,7 @@ export default {
         "film"
       );
       geolocation.getLocation(function(res) {
+        
           let { lat, lng, city } = res;
          _this.$router.push({
             name: "cinema-list",
@@ -39,20 +40,19 @@ export default {
         function(err) {
           //用户拒绝定位
           _this.$router.push({
-            name: "cinema-list",
-            query: {
-              refuse: true
-            }
+            name: "cinema-list"
           });
         }
       );
 
       //实时监听位置变化
-      geolocation.watchPosition(function(res) {});
+      //geolocation.watchPosition(function(res) {});
     }
   },
   mounted() {
-    this.getPos();
+    if(!sessionStorage.cinema_id){
+      this.getPos();
+    }
   },
   watch: {
     $route: function(to, from) {

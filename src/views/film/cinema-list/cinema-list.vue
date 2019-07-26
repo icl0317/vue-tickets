@@ -100,7 +100,7 @@ export default {
     },
     //进入首页排期
     toIndexFilm(cinema_id) {
-      alert(cinema_id);
+    
       this.$router.push({
         name: "film-list",
         query: { cinema_id, city: this.queryCon.city }

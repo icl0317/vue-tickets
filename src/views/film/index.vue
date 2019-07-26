@@ -68,7 +68,7 @@
             <div class="film-detail" v-show="playiNow == 1" v-if="filmData[filmiNow]">{{filmData[filmiNow].brief}}</div>
           </div>
         </div>
-        {{bb}}
+   
         <noData :isShow="!filmData" title="还没有排期，换其他影院看看吧~"></noData>
       </div>
     
@@ -254,19 +254,16 @@ export default {
   },
   mounted() {
     let { cinema_id, city } = this.$route.query;
-    if(cinema_id){
-      this.$store.state.currentCinemaId = sessionStorage.cinema_id = this.cinemaInfo.cinema_id = cinema_id;
-      this.cinemaInfo.city = city;
+    if(cinema_id){  //影院列表过来的
+      sessionStorage.cinema_id = this.cinemaInfo.cinema_id = cinema_id;
+      sessionStorage.city = this.cinemaInfo.city = city;
       this.getFilmData();
-    }else{
-
     }
-    // if (!this.cinemaInfo.cinema_id) {
-    //   this.getPos();
-    // } else {
-    //   this.getFilmData();
-    // }
-    //this.getPos();
+    if(sessionStorage.cinema_id){ //刷新页面的
+      this.cinemaInfo.cinema_id = sessionStorage.cinema_id;
+      this.cinemaInfo.city = sessionStorage.city
+      this.getFilmData();
+    }
   }
 };
 </script>
