@@ -144,7 +144,7 @@ export default {
           this.cinemaInfo.address = "暂无影片";
         } else if (code == 2) {
           this.$router.push({
-            name: "city-list"
+            name: "cinema-list"
           });
           return;
         }

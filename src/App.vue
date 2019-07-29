@@ -26,8 +26,8 @@ export default {
         "film"
       );
       geolocation.getLocation(function(res) {
-        
           let { lat, lng, city } = res;
+          localStorage.piao_position = [lat, lng];
          _this.$router.push({
             name: "cinema-list",
             query: {

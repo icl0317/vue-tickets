@@ -18,4 +18,11 @@ npm run build
 npm run build --report
 ```
 
-For a detailed explanation on how things work, check out the [guide](http://vuejs-templates.github.io/webpack/) and [docs for vue-loader](http://vuejs.github.io/vue-loader).
+# 本地缓存
+cookie
+    tokken（登录后）
+localstorage
+    piao_position   定位坐标
+sessionstorage
+    cinema_id   影院id
+    city        所在城市

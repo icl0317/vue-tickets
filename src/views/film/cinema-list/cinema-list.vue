@@ -174,6 +174,8 @@ export default {
   mounted() {
     let { lat, lng, city } = this.queryCon = this.$route.query;
     if (city) {
+      this.queryCon.lat = lat || localStorage.piao_position.split(',')[0];
+      this.queryCon.lng = lng || localStorage.piao_position.split(',')[1];
       this.getCinemaDate();
     }else{
       this.cityShow = true;
