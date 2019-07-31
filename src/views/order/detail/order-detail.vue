@@ -74,7 +74,7 @@
           {{data.pay_price}}元
           <em
             class="serve_price"
-          >（含服务费：{{data.serve_price}}元 * {{data.seat && data.seat.length}}）</em>
+          >（含服务费：{{data.serve_price / data.seat.length}}元 * {{data.seat && data.seat.length}}）</em>
         </li>
       </ul>
     </div>

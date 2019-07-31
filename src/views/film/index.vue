@@ -65,6 +65,7 @@
                 </li>
               </ul>
             </div>
+            <div style="text-align:center; color:#999; padding-top:10px;">京ICP备19034304号</div>
             <div class="film-detail" v-show="playiNow == 1" v-if="filmData[filmiNow]">{{filmData[filmiNow].brief}}</div>
           </div>
         </div>
