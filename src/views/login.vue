@@ -14,7 +14,6 @@
 <script>
 import { userLogin } from '@/api/api';
 import { Toast } from 'mint-ui';
-import Cookies from 'js-cookie';
 export default {
   data() {
     return {
@@ -29,10 +28,10 @@ export default {
      userLogin(this.loginInfo).then(res=>{
        let {data,code,msg} = res;
        if(code == 0){
-         Cookies.set('piao_token',data.token,{ expires: 1 })
-         Cookies.set('piao_username',data.username,{ expires: 1 })
-         this.$store.state.piaoToken = data.token;
-         this.$store.state.piao_username = data.username;
+         this.$store.dispatch({
+            type:'user/login',
+            ...data
+         })
          this.$router.push({
            name:'film-list'
          })
@@ -41,9 +40,6 @@ export default {
        }
      })
    }
-  },
-  mounted(){
-    
   }
 }
 </script>

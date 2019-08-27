@@ -20,8 +20,8 @@ export default {
   text-align: center;
   background: #e6f6ff;
   font-size: @smallSize;
-  padding: 2px 2px 0;
-  vertical-align: middle;
+  padding: 0px 2px 0;
+  vertical-align: text-top;
   .borderRadius(2px);
 }
 </style>

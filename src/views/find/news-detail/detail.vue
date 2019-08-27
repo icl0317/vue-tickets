@@ -14,7 +14,7 @@
 <script>
 import topBar from "@/components/topBar/topbar";
 import { getFindDetail, like } from "@/api/api";
-import { timeFormat } from '@/utils/util';
+import { parseDateTime } from '@/utils/index';
 import loading from "@/components/loading/loading";
 import Cookies from 'js-cookie';
 export default {
@@ -84,15 +84,13 @@ export default {
   },
   created(){
     this.newsId = this.$route.query._id;
-    
-    //this.isClikcLike = Cookies.get('likes').split(',')
   },
   mounted(){
     this.getDetail();
   },
   filters:{
     YMD:function(val){
-      return timeFormat(val,'YMD')
+      return parseDateTime(val,'{Y}-{M}-{D}')
     }
   }
 };
@@ -102,7 +100,7 @@ export default {
 @import "../../../style/mixin";
 #news-detail{
   .title{ font-size: @bigSize; font-weight: 600;}
-  .article{ padding: 14px; line-height: 20px; font-size: @normalSize;
+  .article{ padding: 14px; line-height: 22px; font-size: @normalSize;
     img{ max-width: 100%;}
   }
   .title{ padding: 14px 14px 5px;}

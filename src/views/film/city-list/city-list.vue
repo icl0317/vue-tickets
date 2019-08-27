@@ -38,7 +38,7 @@
 import topBar from "@/components/topBar/topbar";
 import loading from "@/components/loading/loading";
 import { getCityList } from "@/api/api";
-import { findInArr, rmSame } from "@/utils/util";
+import { findInArr, rmSame } from "@/utils/index";
 import { Toast } from 'mint-ui';
 export default {
   name: "",

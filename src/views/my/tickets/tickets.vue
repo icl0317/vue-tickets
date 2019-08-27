@@ -1,6 +1,6 @@
 <template>
   <div id="tickets">
-    <topBar title="我的影票"></topBar>
+    <topBar></topBar>
     <ul class="list">
       <li :class="[server_time > dateTime2Stamp(item.end_datetime) ? 'over' : 'unplay']" v-for="(item,index) in list" :key="index">
         <div class="piao-status">
@@ -22,7 +22,7 @@
 import topBar from "@/components/topBar/topbar";
 import { getOrderList } from "@/api/api";
 import { Toast } from "mint-ui";
-import { timeFormat, dateTime2Stamp } from "@/utils/util";
+import { timeFormat, dateTime2Stamp } from "@/utils/index";
 export default {
   name: "",
   components: {

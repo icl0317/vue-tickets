@@ -1,6 +1,6 @@
 <template>
   <div id="order-detail">
-    <topBar title="订单详情"></topBar>
+    <topBar></topBar>
     <div class="start-cd" v-if="data.status == 1 && cdStart != 0">
       距离开场还有
       <span>{{cdStart}}</span>
@@ -12,7 +12,7 @@
           <span>{{data.total_price + data.serve_price}}</span>元
         </dt>
         <dd>
-         请在<em id="paycd">{{cdTime.m}}分{{cdTime.s}}分</em>内完成支付
+         请在<em id="paycd">{{cdTime}}</em>内完成支付
         </dd>
         <dd>
           <button class="cancel-pay-btn" type="button" @click="cancelOrder">取消订单</button>
@@ -74,6 +74,7 @@
           {{data.pay_price}}元
           <em
             class="serve_price"
+            v-if="data.seat"
           >（含服务费：{{data.serve_price / data.seat.length}}元 * {{data.seat && data.seat.length}}）</em>
         </li>
       </ul>
@@ -96,7 +97,7 @@
 <script>
 import topBar from "@/components/topBar/topbar";
 import langType from "@/components/langType/lang-type";
-import { timeFormat, dateTime2Stamp } from "@/utils/util";
+import { parseDateTime, dateTime2Stamp } from "@/utils/index";
 import { orderDetail, cancelOrder, payOrder } from "@/api/api";
 import { Toast, MessageBox, Indicator } from "mint-ui";
 import loading from "@/components/loading/loading";
@@ -126,8 +127,8 @@ export default {
         let { msg, code, data } = res;
         if (code == 0) {
           data.server_datetime / 1000 > dateTime2Stamp(data.end_datetime) ? this.isEnd = true : this.isEnd = false; //是否完场
-          data._start_datetime = timeFormat(data.start_datetime);
-          data._end_datetime = timeFormat(data.end_datetime);
+          data._start_datetime = parseDateTime(data.start_datetime);
+          data._end_datetime = parseDateTime(data.end_datetime);
           this.data = data;
           if (data.status === 0) this.payCd();
           
@@ -184,7 +185,7 @@ export default {
       } else {
         this.timer = setInterval(() => {
           cds--;
-          this.cdTime = timeFormat (cds);
+          this.cdTime = `${parseInt(cds / 60)}分${cds % 60}秒`;
           if (cds <= 0) {            
             clearInterval(this.timer);
             MessageBox.alert("订单已过期").then(action => {
@@ -196,7 +197,7 @@ export default {
         }, 1000);
       }
 
-      this.cdTime = timeFormat(cds);
+      this.cdTime = `${parseInt(cds / 60)}分${cds % 60}秒`;
     },
     //取消订单
     cancelOrder() {
@@ -371,5 +372,6 @@ export default {
   }
   .much,.get-code{ color: @lightColor; margin-top: 5px;}
   .lose{ opacity: 0.5;}
+  #paycd{ display: inline-block; width: 2.4rem;}
 }
 </style>

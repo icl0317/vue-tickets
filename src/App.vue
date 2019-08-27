@@ -9,7 +9,6 @@
 
 <script>
 import { getLocationCollege } from "@/api/api";
-import { MessageBox } from "mint-ui";
 export default {
   name: "App",
   data() {
@@ -25,9 +24,13 @@ export default {
         "EZMBZ-A4MEX-MWA4L-T4MZK-66OO5-3OBTD",
         "film"
       );
+    
       geolocation.getLocation(function(res) {
           let { lat, lng, city } = res;
-          localStorage.piao_position = [lat, lng];
+          let getHistory = JSON.parse(localStorage._history || '{}');
+          //如果定位城市和历史记录没有变化
+          if(city.indexOf(getHistory.city) !== -1)return;
+          //localStorage.piao_position = [lat, lng];
          _this.$router.push({
             name: "cinema-list",
             query: {
@@ -39,6 +42,8 @@ export default {
         },
         function(err) {
           //用户拒绝定位
+          let getHistory = JSON.parse(localStorage._history || '{}');
+          if(getHistory.city)return;
           _this.$router.push({
             name: "cinema-list"
           });
@@ -50,9 +55,8 @@ export default {
     }
   },
   mounted() {
-    if(!sessionStorage.cinema_id){
-      this.getPos();
-    }
+    this.getPos();
+    
   },
   watch: {
     $route: function(to, from) {

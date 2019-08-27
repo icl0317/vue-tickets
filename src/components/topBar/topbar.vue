@@ -1,7 +1,8 @@
 <template>
   <div id="top-bar" v-if="isShow">
     <span class="go-back iconfont" @click="goBack" v-if="backShow">&#xe6bc;</span>
-    <h2 class="title">{{title}}</h2>
+    <h2 class="title" v-if="title">{{title}}</h2>
+    <h2 class="title" v-else>{{setTitle}}</h2>
     <slot></slot>
   </div>
 </template>
@@ -16,7 +17,7 @@ export default {
     },
     title: {
       type: String,
-      default: "学校列表"
+      default: null
     },
     backShow:{
       type: Boolean,
@@ -24,12 +25,17 @@ export default {
     }
   },
   data() {
-    return {};
+    return {
+      setTitle:''
+    }
   },
   methods:{
     goBack(){
       this.$router.go(-1);
     }
+  },
+  created(){
+    this.setTitle = this.$route.meta.title
   }
 };
 </script>
@@ -37,8 +43,8 @@ export default {
 <style lang="less" scoped>
 @import "../../style/mixin";
 #top-bar {
-  height: 48px;
-  line-height: 48px;
+  height: 44px;
+  line-height: 44px;
   background: #313540;
   padding: 0 10px;
   color: @fff;

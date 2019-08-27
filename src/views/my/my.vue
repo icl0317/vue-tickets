@@ -22,6 +22,7 @@
         </ul>
       </div>
     </div>
+    
     <fixedFoot></fixedFoot>
   </div>
 </template>
@@ -30,6 +31,7 @@
 import fixedFoot from "@/components/fixedFooter/foot";
 import io from "socket.io-client";
 import { myInfo } from "@/api/api";
+import { mapGetters } from 'vuex'
 export default {
   name: "",
   components: {
@@ -37,8 +39,9 @@ export default {
   },
   data() {
     return {
-      username: this.$store.state.piaoUserName,
-      data: {}
+      data: {
+        unpay:0
+      }
     };
   },
   methods: {
@@ -63,6 +66,11 @@ export default {
   },
   mounted() {
     this.getUnPayOrder();
+  },
+  computed:{
+    ...mapGetters([
+      'username'
+    ])
   }
 };
 </script>

@@ -4,11 +4,9 @@ import router from './router'
 import './utils/rem'
 import MintUI from 'mint-ui'
 import 'mint-ui/lib/style.css'
-import store from './store/store'
+import store from './store/index'
 
 Vue.use(MintUI)
-
-//import 'lib-flexible'
 
 Vue.config.productionTip = false
 

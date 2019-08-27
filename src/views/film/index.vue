@@ -9,20 +9,7 @@
           <span class="go-info iconfont">&#xe61f;</span>
         </div>
         <div v-if="filmData">
-          <div class="swipe-wrap">
-            <div class="swipe-slide" ref="swipeSlide">
-              <ul class="imgs clearfix" ref="imgs" style="-webkit-transform:translate3d(150px,0,0)">
-                <li
-                  v-for="(item , index) in filmData"
-                  :key="index"
-                  :class="{active : index == filmiNow}"
-                >
-                  <img :src="item.film_photo" />
-                </li>
-              </ul>
-              <b class="center-mark"></b>
-            </div>
-          </div>
+          <swiper :data = "filmData" @swiper-change = "changeVal"></swiper>
 
           <div class="film-intro" v-if="filmData[filmiNow]">
             <h3>{{filmData[filmiNow].film_name}}</h3>
@@ -47,11 +34,11 @@
                       <div class="start-time">{{item._start_datetime.h}}:{{item._start_datetime.m}}</div>
                       <div class="end-time">{{item._end_datetime.h}}:{{item._end_datetime.m}}散场</div>
                     </div>
-                    <div class="screen-block" style="width:80px;">
+                    <div class="screen-block">
                       <div class="screen-name">{{item.screen_name}}</div>
                       <div class="language">{{item.language}} {{item.screen_type}}</div>
                     </div>
-                    <div class="price-block" style="width:65px;">
+                    <div class="price-block">
                       <div class="price">
                         特惠
                         <br />
@@ -65,7 +52,7 @@
                 </li>
               </ul>
             </div>
-            <div style="text-align:center; color:#999; padding-top:10px;">京ICP备19034304号</div>
+            <!-- <div style="text-align:center; color:#999; padding-top:10px;">京ICP备19034304号</div> -->
             <div class="film-detail" v-show="playiNow == 1" v-if="filmData[filmiNow]">{{filmData[filmiNow].brief}}</div>
           </div>
         </div>
@@ -82,16 +69,18 @@
 import fixedFoot from "@/components/fixedFooter/foot";
 import loading from "@/components/loading/loading";
 import noData from "@/components/noData/nodata";
-import { timeFormat, findInArr } from "@/utils/util";
+import swiper from "@/components/swiper/swiper";
+import { parseDateTime, findInArr } from "@/utils/index";
 import { getIndexFilmList, getCinemaList } from "@/api/api";
-import "@/utils/geolocation.min";
+import "@/vendor/geolocation.min";
 
 export default {
   name: "film-list",
   components: {
     fixedFoot,
     loading,
-    noData
+    noData,
+    swiper
   },
   data() {
     return {
@@ -152,67 +141,11 @@ export default {
 
         this.loading = false;
 
-        setTimeout(()=>{
-        //轮播图
-        let oImg = this.$refs.imgs;
-        let oScroll = this.$refs.swipeSlide;
-        let tx = 150;
-        let iNow = 0;
-        let filmLen = this.filmData.length;
-
-        oImg.addEventListener(
-          "touchstart",
-          ev => {
-            let downX = ev.targetTouches[0].pageX;
-            let disX = downX - tx;
-            oImg.style.WebkitTransition = "none";
-
-            let fnMove = ev => {
-              tx = ev.targetTouches[0].pageX - disX;
-              oImg.style.WebkitTransform = "translate3d(" + tx + "px,0,0)";
-            };
-
-            oScroll.addEventListener("touchmove", fnMove, false);
-
-            let fnEnd = ev => {
-              oScroll.removeEventListener("touchmove", fnMove, false);
-              oScroll.removeEventListener("touchend", fnEnd, false);
-              let upX = ev.changedTouches[0].pageX;
-
-              if (Math.abs(downX - upX) > 40 && Math.abs(downX - upX) < 80) {
-                //切换
-                if (downX > upX) {
-                  //往左， ++
-                  iNow++;
-                  if (iNow >= filmLen - 1) iNow = filmLen - 1;
-                } else {
-                  iNow--;
-                  if (iNow <= 0) iNow = 0;
-                }
-              } else if (Math.abs(downX - upX) >= 80) {
-                if (downX > upX) {
-                  //往左， ++
-                  iNow += 2;
-                  if (iNow >= filmLen - 1) iNow = filmLen - 1;
-                } else {
-                  iNow -= 2;
-                  if (iNow <= 0) iNow = 0;
-                }
-              }
-
-              tx = 150 - iNow * 75;
-              oImg.style.WebkitTransition = ".4s all ease";
-              oImg.style.WebkitTransform = "translate3d(" + tx + "px,0,0)";
-              this.filmiNow = iNow;
-            };
-
-            oScroll.addEventListener("touchend", fnEnd, false);
-          },
-          false
-        );
-        },1000)
       });
       
+    },
+    changeVal(index){
+      this.filmiNow = index;
     },
     //后台数据格式转换
     formatFilmData(list) {
@@ -237,8 +170,8 @@ export default {
             sell_price: v.sell_price,
             session_id: v._id,
             screen_id: v.screen_id,
-            _start_datetime:timeFormat(v.start_datetime),
-            _end_datetime:timeFormat(v.end_datetime)
+            _start_datetime:parseDateTime(v.start_datetime),
+            _end_datetime:parseDateTime(v.end_datetime)
           }
         ];
 
@@ -256,13 +189,15 @@ export default {
   mounted() {
     let { cinema_id, city } = this.$route.query;
     if(cinema_id){  //影院列表过来的
-      sessionStorage.cinema_id = this.cinemaInfo.cinema_id = cinema_id;
-      sessionStorage.city = this.cinemaInfo.city = city;
+      this.cinemaInfo.cinema_id = cinema_id;
+      this.cinemaInfo.city = city;
+      localStorage._history = JSON.stringify({cid:cinema_id, city:city});
       this.getFilmData();
     }
-    if(sessionStorage.cinema_id){ //刷新页面的
-      this.cinemaInfo.cinema_id = sessionStorage.cinema_id;
-      this.cinemaInfo.city = sessionStorage.city
+    let getHistory = JSON.parse(localStorage._history || '{}');
+    if(getHistory.cid){ //刷新页面的
+      this.cinemaInfo.cinema_id = getHistory.cid;
+      this.cinemaInfo.city = getHistory.city
       this.getFilmData();
     }
   }
@@ -272,7 +207,7 @@ export default {
 @import "../../style/mixin";
 
 #film {
-  padding-bottom: 40px;
+  height: 101%;
   .film-content {
     background: @fff;
     z-index: 9;
@@ -300,79 +235,7 @@ export default {
         .textCut();
       }
     }
-    .swipe-wrap {
-      height: 128px;
-      background: rgba(0, 0, 0, 0.8);
-      padding: 15px 0 0 0;
-      margin-bottom: 10px;
-      .swipe-slide {
-        width: 100%;
-        height: 100%;
-        overflow: hidden;
-        position: relative;
-      }
-      .imgs {
-        width: 1000px;
-        display: flex;
-        align-items: flex-end;
-      }
-      .imgs li {
-        float: left;
-        width: 75px;
-        text-align: center;
-      }
-      .imgs img {
-        width: 62px;
-        height: 92px;
-      }
-      .imgs .active img {
-        width: 72px;
-        height: 102px;
-      }
-      .center-mark {
-        width: 0;
-        height: 0;
-        border-left: 6px solid transparent;
-        border-right: 6px solid transparent;
-        border-bottom: 6px solid #fff;
-        .hz();
-        bottom: 0;
-      }
-      .film-pic {
-        float: left;
-        margin-right: 10px;
-      }
-      .film-name {
-        font-size: @bigSize;
-        font-weight: 500;
-        color: @fff;
-        margin-bottom: 6px;
-        .textCut();
-      }
-      .film-type span {
-        display: inline-block;
-        padding: 1px 5px;
-        background: #e5dadc;
-        .borderRadius(3px);
-        margin-right: 4px;
-      }
-      .director,
-      .duration {
-        color: @fff;
-        .textCut();
-        margin-top: 6px;
-      }
-      .performer {
-        max-height: 32px;
-        color: @fff;
-        margin-top: 6px;
-        .RowsCut(2);
-      }
-      .mint-swipe-indicator.is-active {
-        background: @warnColor;
-        opacity: 0.8;
-      }
-    }
+    
     .film-info {
       padding: 0 10px;
     }
@@ -430,7 +293,6 @@ export default {
       .price-block,
       .buy-block {
         float: left;
-        height: 100%;
         width: 75px;
         height: 100%;
       }
@@ -440,7 +302,7 @@ export default {
       .start-time {
         font-size: 20px;
         font-weight: 300;
-        margin-top: 6px;
+        margin-top: 8px;
       }
       .end-time {
         margin-top: 2px;
@@ -465,7 +327,7 @@ export default {
       }
       .screen-name {
         height: 20px;
-        margin-top: 12px;
+        margin-top: 14px;
         .textCut();
       }
       .flow {
@@ -481,6 +343,7 @@ export default {
       .buy-block {
         float: left;
         text-align: center;
+        width: 66px;
       }
       .go-buy {
         display: inline-block;

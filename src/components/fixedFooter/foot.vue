@@ -52,7 +52,7 @@ export default {
   right: 0;
   background: #fff;
   z-index: 999;
-  height: 46px;
+  height: 50px;
   border-top: 1px solid #f0f0f0;
   .foot-flex {
     display: flex;

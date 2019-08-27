@@ -1,6 +1,6 @@
 <template>
   <div id="cinema-list">
-    <topBar :backShow="false" title="选择影院">
+    <topBar :backShow="false" :title="title">
       <span class="go-info iconfont" :class="{active: cityShow}" @click="cityListSet">
         {{queryCon.city}}
         <i class="sj"></i>
@@ -21,6 +21,7 @@
         <div class="dis" v-if="item.dis">{{item.dis | unitFormat}}</div>
       </li>
     </ul>
+    <!-- 城市列表 -->
     <div class="city-list-box" v-show="cityShow">
       <dl class="city-list" v-for="(item,index) in formatCity" :key="index">
         <dt>{{item.province}}</dt>
@@ -31,7 +32,7 @@
         </dd>
       </dl>
     </div>
-    <loading :isShow="loading"></loading>
+    
   </div>
 </template>
 
@@ -40,7 +41,7 @@ import topBar from "@/components/topBar/topbar";
 import loading from "@/components/loading/loading";
 import { getCinemaList, getCityList } from "@/api/api";
 import { Toast } from "mint-ui";
-import { findInArr, rmSame } from "@/utils/util";
+import { findInArr, rmSame } from "@/utils/index";
 export default {
   name: "",
   components: {
@@ -53,7 +54,8 @@ export default {
       cinemaData: [],
       cityList: [],
       cityShow: false,
-      queryCon:{} //获取影院条件
+      queryCon:{}, //获取影院条件
+      title:null  //标题
     };
   },
   methods: {
@@ -63,16 +65,6 @@ export default {
       getCinemaList(this.queryCon).then(res => {
         let { code, data, msg } = res;
         if (code == 0) {
-          if (data.userLng) {
-            data.data.forEach(v => {
-              v.dis = this.getDistance(
-                data.userLat,
-                data.userLng,
-                v.lat,
-                v.lng
-              );
-            });
-          }
           this.cinemaData = data.data;
         } else {
           Toast(msg);
@@ -94,13 +86,12 @@ export default {
       });
     },
     selectCity(city) {
-      this.cityShow = false;
+      this.cityShow = this.title = false;
       this.queryCon.city = city;
       this.getCinemaDate();
     },
     //进入首页排期
     toIndexFilm(cinema_id) {
-    
       this.$router.push({
         name: "film-list",
         query: { cinema_id, city: this.queryCon.city }
@@ -109,33 +100,10 @@ export default {
     //控制城市列表
     cityListSet() {
       this.cityShow = !this.cityShow;
-      if(this.cityShow)this.getCityData();
-    },
-    //计算2点间距离
-    getDistance(lat1, lng1, lat2, lng2) {
-      var f = this.getRad((lat1 * 1 + lat2 * 1) / 2);
-      var g = this.getRad((lat1 * 1 - lat2 * 1) / 2);
-      var l = this.getRad((lng1 * 1 - lng2 * 1) / 2);
-      var sg = Math.sin(g);
-      var sl = Math.sin(l);
-      var sf = Math.sin(f);
-      var s, c, w, r, d, h1, h2;
-      var a = 6378137.0; //The Radius of eath in meter.
-      var fl = 1 / 298.257;
-      sg = sg * sg;
-      sl = sl * sl;
-      sf = sf * sf;
-      s = sg * (1 - sl) + (1 - sf) * sl;
-      c = (1 - sg) * (1 - sl) + sf * sl;
-      w = Math.atan(Math.sqrt(s / c));
-      r = Math.sqrt(s * c) / w;
-      d = 2 * w * a;
-      h1 = (3 * r - 1) / 2 / c;
-      h2 = (3 * r + 1) / 2 / s;
-      s = d * (1 + fl * (h1 * sf * (1 - sg) - h2 * (1 - sf) * sg));
-      s = s / 1000;
-      s = s.toFixed(2); //指定小数点后的位数。
-      return s;
+      if(this.cityShow){
+        this.getCityData()
+        this.title = '城市'
+      }
     },
     getRad(d) {
       var PI = Math.PI;
@@ -148,6 +116,7 @@ export default {
       let arr = [];
       this.cityList.forEach(v => {
         let json = {};
+        
         json.province = v.province.split(",")[0];
         json.children = [
           {
@@ -174,8 +143,9 @@ export default {
   mounted() {
     let { lat, lng, city } = this.queryCon = this.$route.query;
     if (city) {
-      this.queryCon.lat = lat || localStorage.piao_position.split(',')[0];
-      this.queryCon.lng = lng || localStorage.piao_position.split(',')[1];
+
+      this.queryCon.lat = lat || localStorage.piao_position ? localStorage.piao_position.split(',')[0] : '';
+      this.queryCon.lng = lng || localStorage.piao_position ? localStorage.piao_position.split(',')[1] : '';
       this.getCinemaDate();
     }else{
       this.cityShow = true;
@@ -275,7 +245,8 @@ export default {
     -webkit-backface-visibility: hidden;
     position: absolute;
     right: -12px;
-    top: 22px;
+    top: 50%;
+    margin-top: -2px;
     width: 0;
     height: 0;
     border-width: 4px;
@@ -288,7 +259,8 @@ export default {
     .sj {
       -webkit-transform: rotate(-180deg);
       transform: rotate(-180deg);
-      top: 18px;
+      top: 50%;
+      margin-top: -7px;
     }
   }
 }

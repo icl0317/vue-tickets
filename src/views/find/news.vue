@@ -27,7 +27,7 @@ import noData from "@/components/noData/nodata";
 import { getFindNew } from "@/api/api";
 import loading from "@/components/loading/loading";
 import { Toast } from 'mint-ui';
-import { timeFormat } from '@/utils/util';
+import { parseDateTime } from '@/utils/index';
 export default {
   name: "",
   components: {
@@ -70,7 +70,7 @@ export default {
   },
   filters:{
     YMD:function(val){
-      return timeFormat(val,'YMD')
+      return parseDateTime(val,'{Y}-{M}-{D}')
     }
   }
 };
