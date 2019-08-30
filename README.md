@@ -81,4 +81,8 @@ npm run dev
 ├── favicon.ico                                 // 图标
 ├── index.html                                  // 入口html文件
 
-```
+```  
+
+# License
+
+ICH
