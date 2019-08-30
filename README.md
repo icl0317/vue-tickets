@@ -1,6 +1,6 @@
-# piao
+# vue 在线选座购票
 
-> A Vue.js project
+此项目为自行瞎搞，功能效果并不完善，主体实现了选座购票流程；有注册环节随意输入，支付环节为假象，可随意下单，后续会继续完善。
 
 ## Build Setup
 
@@ -17,12 +17,3 @@ npm run build
 # build for production and view the bundle analyzer report
 npm run build --report
 ```
-
-# 本地缓存
-cookie
-    tokken（登录后）
-localstorage
-    piao_position   定位坐标
-sessionstorage
-    cinema_id   影院id
-    city        所在城市
