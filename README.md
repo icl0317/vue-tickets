@@ -22,7 +22,6 @@ npm run dev
 
 ## 项目结构  
 ```  
-.
 ├── build                                       // webpack配置文件
 ├── config                                      // 项目打包路径
 ├── dist                                        // 打包后文件
@@ -46,15 +45,15 @@ npm run dev
 │   │   ├── modules                             // store模块
 │   │       └── user.js                         // 用户状态管理  
 │   └── style
-│       ├── common.scss                         // 公共样式文件
-│       ├── mixin.scss                          // 样式配置文件
-│       └── font-icons                          // 字体图标  
+│   |   ├── common.scss                         // 公共样式文件
+│   |   ├── mixin.scss                          // 样式配置文件
+│   |   └── font-icons                          // 字体图标  
 │   └── utils                                   // 常用js工具
-│       ├── index.js                            // 工具
-│       ├── rem.js                              // rem适配  
+│   |   ├── index.js                            // 工具
+│   |   ├── rem.js                              // rem适配  
 │   └── vendor                                  // js插件
-│       ├── geolocation.min.js                  // 腾讯定位服务
-│       ├── hammer.min.js                       // touch
+│   |   ├── geolocation.min.js                  // 腾讯定位服务
+│   |   ├── hammer.min.js                       // touch
 │   ├── views
 │   │   ├── film
 │   │   │   ├── index.vue                       // 首页  
@@ -81,5 +80,5 @@ npm run dev
 │   ├── main.js                                 // 程序入口文件，加载各种公共组件
 ├── favicon.ico                                 // 图标
 ├── index.html                                  // 入口html文件
-. 
+
 ```
