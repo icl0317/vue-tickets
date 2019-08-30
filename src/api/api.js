@@ -1,5 +1,6 @@
 /**
- * 前台api needLogin = true 需要登录权限才可访问
+ * 前台api
+ * needLogin = true 需要登录权限才可访问
  */
 
 import {Post, Get} from './http'

@@ -12,7 +12,7 @@ const http = axios.create({
 // 添加请求拦截器
 http.interceptors.request.use(
   function (config) {
-    // 在发送请求之前做些什么
+    // 全局发送token
     let getPiaoToken = store.state.user.mpp_token
     if (getPiaoToken) {
       config.headers['X-Token'] = getPiaoToken
@@ -28,11 +28,11 @@ http.interceptors.request.use(
 // 添加响应拦截器
 http.interceptors.response.use(
   function (response) {
-    // 对响应数据做点什么
-    if (response.data.code == 20003) {
+    // 全局验证token错误
+    if (response.data.code === 20003) {
       Toast(response.data.msg)
-      Cookies.remove('piao_token', { path: '' })
-      store.state.piaoToken = ''
+      Cookies.remove('mpp_token', { path: '' })
+      store.state.user.mpp_token = ''
     }
     return response.data
   },
@@ -41,6 +41,6 @@ http.interceptors.response.use(
     return Promise.reject(error)
   }
 )
-Vue.prototype.$axios = axios
+Vue.prototype.$axios = axios // 暴露给全局
 export const Post = (url, params) => http.post(url, params)
 export const Get = (url, params) => http.get(url, { params })
