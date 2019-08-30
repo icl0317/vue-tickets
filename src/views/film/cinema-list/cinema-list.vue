@@ -145,8 +145,8 @@ export default {
     let { lat, lng, city } = this.queryCon = this.$route.query;
     
     if (city) {
-      this.queryCon.lat = lat || localStorage.piao_position ? localStorage.piao_position.split(',')[0] : '';
-      this.queryCon.lng = lng || localStorage.piao_position ? localStorage.piao_position.split(',')[1] : '';
+      this.queryCon.lat = lat || localStorage.mpp_position ? localStorage.mpp_position.split(',')[0] : '';
+      this.queryCon.lng = lng || localStorage.mpp_position ? localStorage.mpp_position.split(',')[1] : '';
       this.getCinemaDate();
     }else{
       this.queryCon.city = '城市';

@@ -30,7 +30,8 @@ export default {
           let getHistory = JSON.parse(localStorage._history || '{}');
           //如果定位城市和历史记录没有变化
           if(city.indexOf(getHistory.city) !== -1)return;
-          //localStorage.piao_position = [lat, lng];
+          
+          localStorage.mpp_position = [lat, lng];
          _this.$router.push({
             name: "cinema-list",
             query: {
