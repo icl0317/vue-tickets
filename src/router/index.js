@@ -152,6 +152,9 @@ router.beforeEach((to, from, next) => {
     }
     return
   }
+  if (to.meta.title) {
+    document.title = to.meta.title
+  }
   next()
 })
 

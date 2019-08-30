@@ -83,8 +83,8 @@
     <div class="bd-box">
       <div class="order-info-cloumn">观影须知</div>
       <ul class="notice">
-        <li>&middot; 影票售出后，不支持退换</li>
-        <li>&middot; 请提前打开影票二维码凭码入场，避免观影人数过多滞留场外</li>
+        <li>&middot; 请提前到达影院现场，扫码场</li>
+        <li>&middot; 改签、退票服务由影城界定，特殊场次不支持改签、退票</li>
         <li>&middot; 由于设备故障等不可抗因素，会进行退票退款</li>
       </ul>
     </div>

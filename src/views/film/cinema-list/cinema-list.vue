@@ -196,7 +196,7 @@ export default {
   .dis {
     position: absolute;
     right: 15px;
-    top: 33px;
+    top: 35px;
   }
   .city-list-box {
     position: absolute;
