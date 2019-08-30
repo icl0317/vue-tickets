@@ -4,7 +4,6 @@ import store from '@/store/index'
 import { Toast } from 'mint-ui'
 
 import filmList from '@/views/film/index'
-import cityList from '@/views/film/city-list/city-list'
 import cinemaList from '@/views/film/cinema-list/cinema-list'
 import news from '@/views/find/news'
 import newsDetail from '@/views/find/news-detail/detail'
@@ -32,15 +31,6 @@ const router = new Router({
       meta: {
         title: '电影',
         deepPath: 0
-      }
-    },
-    {
-      path: '/city-list',
-      name: 'city-list',
-      component: cityList,
-      meta: {
-        title: '城市列表',
-        deepPath: 2
       }
     },
     {

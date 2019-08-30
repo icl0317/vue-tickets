@@ -86,7 +86,8 @@ export default {
       });
     },
     selectCity(city) {
-      this.cityShow = this.title = false;
+      this.cityShow = false;
+      this.title = null;
       this.queryCon.city = city;
       this.getCinemaDate();
     },
@@ -142,12 +143,13 @@ export default {
   },
   mounted() {
     let { lat, lng, city } = this.queryCon = this.$route.query;
+    
     if (city) {
-
       this.queryCon.lat = lat || localStorage.piao_position ? localStorage.piao_position.split(',')[0] : '';
       this.queryCon.lng = lng || localStorage.piao_position ? localStorage.piao_position.split(',')[1] : '';
       this.getCinemaDate();
     }else{
+      this.queryCon.city = '城市';
       this.cityShow = true;
     }
     this.getCityData();
