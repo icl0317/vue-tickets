@@ -1,19 +1,21 @@
-# vue 在线选座购票
+# vue 移动端在线选座购票
 
 此项目为自行瞎搞，功能效果并不完善，主体实现了选座购票流程；有注册环节随意输入，支付环节为假象，可随意下单，后续会继续完善。
 
-## Build Setup
+## 效果演示  
 
-``` bash
-# install dependencies
-npm install
+<img src="https://ich0317.github.io/vue-tickets/screenshot/wangzhi.png" width="200" height="200">  
 
-# serve with hot reload at localhost:8080
-npm run dev
+## 项目运行
 
-# build for production with minification
-npm run build
+``` git bash  
 
-# build for production and view the bundle analyzer report
-npm run build --report
+git clone https://github.com/ich0317/vue-tickets.git  
+
+cd vue-tickets  
+
+npm / cnpm install  
+
+npm run dev  
+
 ```
