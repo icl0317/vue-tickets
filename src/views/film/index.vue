@@ -51,13 +51,18 @@
                   </div>
                 </li>
               </ul>
+              
             </div>
             <!-- <div style="text-align:center; color:#999; padding-top:10px;">京ICP备19034304号</div> -->
             <div class="film-detail" v-show="playiNow == 1" v-if="filmData[filmiNow]">{{filmData[filmiNow].brief}}</div>
+            
           </div>
+
         </div>
-   
+        
         <noData :isShow="!filmData" title="还没有排期，换其他影院看看吧~"></noData>
+        <div style=" position:absolute; z-index:999; text-align:center; left:0;bottom:100px; right:0;"> <a href="http://www.beian.miit.gov.cn/state/outPortal/loginPortal.action;jsessionid=0PQ3RBuAR1AHGu48OyaOCFm7GAv7ZAppTdy3gSxHTUTx4yDDg04H!1067195260" style="color:#000;">京ICP备19034304号</a></div>
+       
       </div>
     
     <fixedFoot></fixedFoot>
